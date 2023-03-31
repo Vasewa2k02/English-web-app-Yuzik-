@@ -21,4 +21,27 @@ export const permissions = [
     descriptor: 'UserController',
     roleId: 1,
   },
+  {
+    method: Method.POST,
+    descriptor: 'DictionaryController',
+    roleId: 2,
+  },
+  {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 2,
+    context: 'getAdminDictionaries',
+  },
+  {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+    context: 'getUserDictionaries',
+  },
+  {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+    context: 'getDictionariesForLearn',
+  },
 ];

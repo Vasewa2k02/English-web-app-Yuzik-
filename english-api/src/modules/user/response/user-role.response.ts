@@ -13,6 +13,9 @@ class RolePermissions implements PermissionsOmitRoleId {
 
   @ApiProperty({ enum: Method })
   method: Method;
+
+  @ApiProperty()
+  context: string | null;
 }
 
 type RoleOmitUserId = Omit<Role, 'userId'>;

@@ -26,6 +26,7 @@ export class UserRepository {
             id: true,
             method: true,
             descriptor: true,
+            context: true,
           },
         },
       },

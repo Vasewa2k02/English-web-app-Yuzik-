@@ -30,15 +30,16 @@ export class JwtAuthGuard extends AuthGuard('jwt') implements CanActivate {
       );
     }
 
-    const className = context.getClass().name;
-    const method = context.switchToHttp().getRequest<Request>().method;
-
-    const userAfterCheckPermission = user.role.permissions.find(
-      (permission) =>
-        permission.descriptor === className && permission.method === method,
-    );
-
-    if (!userAfterCheckPermission) {
+    if (
+      !user.role.permissions.find(
+        (permission) =>
+          permission.descriptor === context.getClass().name &&
+          permission.method ===
+            context.switchToHttp().getRequest<Request>().method &&
+          (permission.context === null ||
+            permission.context === context.getHandler().name),
+      )
+    ) {
       throw new HttpException('Not enough permissions.', HttpStatus.FORBIDDEN);
     }
 

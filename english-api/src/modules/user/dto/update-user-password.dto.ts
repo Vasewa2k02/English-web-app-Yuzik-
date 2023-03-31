@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches } from 'class-validator';
+import { Matches } from 'class-validator';
 
 export class UpdateUserPasswordDto {
   @ApiProperty()
-  @IsString()
+  @Matches(/^.{4,16}$/)
   oldPassword: string;
 
   @ApiProperty()

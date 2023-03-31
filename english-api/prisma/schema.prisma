@@ -65,7 +65,7 @@ model Dictionary {
   name        String
   description String?
   creatorId   Int
-  UserModel   User    @relation(fields: [creatorId], references: [id])
+  userModel   User    @relation(fields: [creatorId], references: [id])
   words       Word[]
 }
 
@@ -113,11 +113,12 @@ model Role {
 }
 
 model Permission {
-  id         Int    @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   descriptor String
+  context    String?
   method     Method
   roleId     Int
-  role       Role   @relation(fields: [roleId], references: [id])
+  role       Role    @relation(fields: [roleId], references: [id])
 }
 
 enum Method {
