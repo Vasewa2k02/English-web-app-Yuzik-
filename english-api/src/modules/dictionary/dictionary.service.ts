@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Dictionary } from '@prisma/client';
 import { DictionaryRepository } from './dictionary.repository';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
@@ -32,5 +33,42 @@ export class DictionaryService {
     return (await this.dictionaryRepository.getAdminDictionaries()).concat(
       await this.dictionaryRepository.getUserDictionaries(id),
     );
+  }
+
+  public async updateDictionary(
+    dictionaryId: number,
+    userId: number,
+    updateDictionaryDto: UpdateDictionaryDto,
+  ): Promise<DictionaryResponse> {
+    await this.checkDictionaryOwner(dictionaryId, userId);
+
+    return await this.dictionaryRepository.updateDictionaryById(
+      dictionaryId,
+      updateDictionaryDto,
+    );
+  }
+
+  public async removeDictionary(
+    dictionaryId: number,
+    userId: number,
+  ): Promise<void> {
+    await this.checkDictionaryOwner(dictionaryId, userId);
+
+    await this.dictionaryRepository.removeDictionaryById(dictionaryId);
+  }
+
+  private async checkDictionaryOwner(
+    dictionaryId: number,
+    userId: number,
+  ): Promise<void> {
+    const dictionary: Dictionary =
+      await this.dictionaryRepository.getDictionaryById(dictionaryId);
+
+    if (dictionary === null || dictionary.creatorId !== userId) {
+      throw new HttpException(
+        'Not owner try to update dictionary or dictionary not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

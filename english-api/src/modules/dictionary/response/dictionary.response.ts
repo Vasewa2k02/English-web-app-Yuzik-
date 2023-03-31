@@ -3,9 +3,10 @@ import { Dictionary } from '@prisma/client';
 import { swaggerType } from 'src/helpers/swagger/utils';
 import { WordResponse } from 'src/modules/word/response/word.response';
 
-export class DictionaryResponse
-  implements Pick<Dictionary, 'name' | 'description' | 'creatorId'>
-{
+export class DictionaryResponse implements Dictionary {
+  @ApiProperty()
+  id: number;
+
   @ApiProperty()
   name: string;
 

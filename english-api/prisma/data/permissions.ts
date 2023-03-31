@@ -44,4 +44,24 @@ export const permissions = [
     roleId: 1,
     context: 'getDictionariesForLearn',
   },
+  {
+    method: Method.PATCH,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'DictionaryController',
+    roleId: 2,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'DictionaryController',
+    roleId: 2,
+  },
 ];

@@ -23,7 +23,7 @@ export class UserService {
       throw new HttpException('User already exists', HttpStatus.CONFLICT);
     }
 
-    const userPassword: string = v4();
+    const userPassword: string = v4().slice(0, 8);
 
     await this.mailService.sendFirstPasswordForUser(
       userPassword,

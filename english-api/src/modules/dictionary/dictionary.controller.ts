@@ -7,11 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
-  HttpCode,
-  HttpStatus,
   Req,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerType } from 'src/helpers/swagger/utils';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
@@ -25,7 +23,7 @@ import { DictionaryResponse } from './response/dictionary.response';
 export class DictionaryController {
   constructor(private readonly dictionaryService: DictionaryService) {}
 
-  @ApiOkResponse()
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
   public create(
@@ -35,17 +33,17 @@ export class DictionaryController {
     return this.dictionaryService.create(+req.user.id, createDictionaryDto);
   }
 
-  @ApiOkResponse()
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
   @Get('admin')
   public getAdminDictionaries(): Promise<DictionaryResponse[]> {
     return this.dictionaryService.getAdminDictionaries();
   }
 
-  @ApiOkResponse()
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
   @Get('user')
   public getUserDictionaries(
     @Req() req: RequestWithUser,
@@ -53,9 +51,9 @@ export class DictionaryController {
     return this.dictionaryService.getUserDictionaries(+req.user.id);
   }
 
-  @ApiOkResponse()
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
   @Get('learn')
   public getDictionariesForLearn(
     @Req() req: RequestWithUser,
@@ -63,21 +61,29 @@ export class DictionaryController {
     return this.dictionaryService.getDictionariesForLearn(+req.user.id);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.dictionaryService.findOne(+id);
-  // }
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  public updateDictionary(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+    @Body() updateDictionaryDto: UpdateDictionaryDto,
+  ): Promise<DictionaryResponse> {
+    return this.dictionaryService.updateDictionary(
+      +id,
+      +req.user.id,
+      updateDictionaryDto,
+    );
+  }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateDictionaryDto: UpdateDictionaryDto,
-  // ) {
-  //   return this.dictionaryService.update(+id, updateDictionaryDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.dictionaryService.remove(+id);
-  // }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  public remove(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ): Promise<void> {
+    return this.dictionaryService.removeDictionary(+id, +req.user.id);
+  }
 }
