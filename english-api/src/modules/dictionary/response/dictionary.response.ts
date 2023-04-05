@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Dictionary } from '@prisma/client';
 import { swaggerType } from 'src/helpers/swagger/utils';
-import { WordResponse } from 'src/modules/word/response/word.response';
+import { WordForDictionaryResponse } from 'src/modules/word/response/word-for-dictionary.response';
 
 export class DictionaryResponse implements Dictionary {
   @ApiProperty()
@@ -16,6 +16,6 @@ export class DictionaryResponse implements Dictionary {
   @ApiProperty()
   creatorId: number;
 
-  @ApiProperty(swaggerType(WordResponse))
-  words: WordResponse[];
+  @ApiProperty(swaggerType(WordForDictionaryResponse))
+  words: WordForDictionaryResponse[];
 }

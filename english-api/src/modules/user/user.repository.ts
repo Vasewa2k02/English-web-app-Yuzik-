@@ -12,11 +12,13 @@ export class UserRepository {
   private userSelect = {
     id: true,
     email: true,
+    roleId: true,
   };
 
   private fullUserSelect = {
     id: true,
     email: true,
+    roleId: true,
     role: {
       select: {
         id: true,

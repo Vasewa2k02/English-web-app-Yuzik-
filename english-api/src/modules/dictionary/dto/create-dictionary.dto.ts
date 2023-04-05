@@ -10,6 +10,5 @@ export class CreateDictionaryDto implements DictionaryCreateType {
   name: string;
 
   @ApiProperty()
-  @Matches(/^.{2,200}$/)
-  description: string;
+  description: string | null;
 }

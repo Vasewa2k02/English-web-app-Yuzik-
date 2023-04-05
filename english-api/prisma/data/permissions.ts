@@ -24,6 +24,11 @@ export const permissions = [
   {
     method: Method.POST,
     descriptor: 'DictionaryController',
+    roleId: 1,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'DictionaryController',
     roleId: 2,
   },
   {
@@ -62,6 +67,36 @@ export const permissions = [
   {
     method: Method.DELETE,
     descriptor: 'DictionaryController',
+    roleId: 2,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'WordController',
+    roleId: 1,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'WordController',
+    roleId: 2,
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'WordController',
+    roleId: 1,
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'WordController',
+    roleId: 2,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'WordController',
+    roleId: 1,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'WordController',
     roleId: 2,
   },
 ];

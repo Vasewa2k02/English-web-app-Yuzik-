@@ -6,39 +6,66 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { WordService } from './word.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { swaggerType } from 'src/helpers/swagger/utils';
+import { WordResponse } from './response/word.response';
 
 @ApiTags('word')
 @Controller('word')
 export class WordController {
   constructor(private readonly wordService: WordService) {}
 
-  @Post()
-  create(@Body() createWordDto: CreateWordDto) {
-    return this.wordService.create(createWordDto);
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post(':id')
+  public createWord(
+    @Req() req: RequestWithUser,
+    @Param('id') dictionaryId: string,
+    @Body() createWordDto: CreateWordDto,
+  ): Promise<void> {
+    return this.wordService.createWord(
+      +req.user.id,
+      +dictionaryId,
+      createWordDto,
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.wordService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.wordService.findOne(+id);
-  }
-
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(WordResponse))
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWordDto: UpdateWordDto) {
-    return this.wordService.update(+id, updateWordDto);
+  public updateWord(
+    @Req() req: RequestWithUser,
+    @Param('id') wordId: string,
+    @Body() updateWordDto: UpdateWordDto,
+  ): Promise<WordResponse> {
+    return this.wordService.updateWord(
+      +req.user.roleId,
+      +wordId,
+      updateWordDto,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.wordService.remove(+id);
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id/dictionary/:dictionaryId')
+  public removeWordFromDictionary(
+    @Req() req: RequestWithUser,
+    @Param('id') id: string,
+    @Param('dictionaryId') dictionaryId: string,
+  ): Promise<void> {
+    return this.wordService.removeWordFromDictionary(
+      +req.user.id,
+      +id,
+      +dictionaryId,
+    );
   }
 }

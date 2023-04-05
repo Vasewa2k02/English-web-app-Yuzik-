@@ -16,6 +16,7 @@ export class DictionaryRepository {
     creatorId: true,
     words: {
       select: {
+        id: true,
         englishSpelling: true,
         transcription: true,
         russianSpelling: true,
@@ -39,7 +40,7 @@ export class DictionaryRepository {
   public async getAdminDictionaries(): Promise<DictionaryResponse[]> {
     return await this.db.dictionary.findMany({
       where: {
-        userModel: {
+        user: {
           roleId: 2,
         },
       },

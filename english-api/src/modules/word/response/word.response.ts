@@ -1,7 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Word } from '@prisma/client';
+import { swaggerType } from 'src/helpers/swagger/utils';
+import { DictionaryForWordResponse } from 'src/modules/dictionary/response/dictionary-for-word.response';
 
-export class WordResponse implements Omit<Word, 'id' | 'description'> {
+export class WordResponse implements Word {
+  @ApiProperty()
+  id: number;
+
   @ApiProperty()
   englishSpelling: string;
 
@@ -12,5 +17,9 @@ export class WordResponse implements Omit<Word, 'id' | 'description'> {
   russianSpelling: string;
 
   @ApiProperty()
-  description?: string;
+  description: string;
+
+  @ApiProperty()
+  @ApiProperty(swaggerType(DictionaryForWordResponse))
+  dictionaries: DictionaryForWordResponse[];
 }

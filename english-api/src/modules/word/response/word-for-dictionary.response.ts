@@ -1,19 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Matches } from 'class-validator';
+import { Word } from '@prisma/client';
 
-export class CreateWordDto {
+export class WordForDictionaryResponse implements Word {
   @ApiProperty()
-  @Matches(/^.{1,30}$/)
+  id: number;
+
+  @ApiProperty()
   englishSpelling: string;
 
   @ApiProperty()
-  @Matches(/^.{1,50}$/)
   transcription: string;
 
   @ApiProperty()
-  @Matches(/^.{1,30}$/)
   russianSpelling: string;
 
   @ApiProperty()
-  description: string | null;
+  description: string;
 }

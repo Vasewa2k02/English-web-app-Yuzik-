@@ -26,11 +26,14 @@ export class DictionaryController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  public create(
+  public createDictionary(
     @Req() req: RequestWithUser,
     @Body() createDictionaryDto: CreateDictionaryDto,
   ): Promise<void> {
-    return this.dictionaryService.create(+req.user.id, createDictionaryDto);
+    return this.dictionaryService.createDictionary(
+      +req.user.id,
+      createDictionaryDto,
+    );
   }
 
   @ApiBearerAuth()

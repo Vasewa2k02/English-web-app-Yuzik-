@@ -9,7 +9,7 @@ import { DictionaryResponse } from './response/dictionary.response';
 export class DictionaryService {
   constructor(private readonly dictionaryRepository: DictionaryRepository) {}
 
-  public async create(
+  public async createDictionary(
     creatorId: number,
     createDictionaryDto: CreateDictionaryDto,
   ): Promise<void> {
@@ -53,20 +53,23 @@ export class DictionaryService {
     userId: number,
   ): Promise<void> {
     await this.checkDictionaryOwner(dictionaryId, userId);
-
     await this.dictionaryRepository.removeDictionaryById(dictionaryId);
   }
 
-  private async checkDictionaryOwner(
+  public async checkDictionaryOwner(
     dictionaryId: number,
     userId: number,
   ): Promise<void> {
     const dictionary: Dictionary =
       await this.dictionaryRepository.getDictionaryById(dictionaryId);
 
-    if (dictionary === null || dictionary.creatorId !== userId) {
+    if (!dictionary) {
+      throw new HttpException('Dictionary not found', HttpStatus.BAD_REQUEST);
+    }
+
+    if (dictionary.creatorId !== userId) {
       throw new HttpException(
-        'Not owner try to update dictionary or dictionary not found',
+        'Not owner try to update dictionary',
         HttpStatus.BAD_REQUEST,
       );
     }
