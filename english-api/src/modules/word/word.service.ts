@@ -1,8 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Word } from '@prisma/client';
 import { DictionaryService } from '../dictionary/dictionary.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
 import { WordResponse } from './response/word.response';
 import { WordRepository } from './word.repository';
 
@@ -17,9 +23,9 @@ export class WordService {
     userId: number,
     dictionaryId: number,
     createWordDto: CreateWordDto,
-  ): Promise<void> {
+  ): Promise<WordForDictionaryResponse> {
     await this.dictionaryService.checkDictionaryOwner(dictionaryId, userId);
-    await this.wordRepository.createWord(dictionaryId, createWordDto);
+    return await this.wordRepository.createWord(dictionaryId, createWordDto);
   }
 
   public async updateWord(
@@ -27,8 +33,19 @@ export class WordService {
     wordId: number,
     updateWordDto: UpdateWordDto,
   ): Promise<WordResponse> {
-    if (!(await this.wordRepository.getWordById(wordId))) {
+    const wordById = await this.wordRepository.getWordById(wordId);
+
+    if (!wordById) {
       throw new HttpException('Word not found', HttpStatus.BAD_REQUEST);
+    }
+
+    const word = await this.wordRepository.getWord(
+      updateWordDto.englishSpelling,
+      updateWordDto.russianSpelling,
+    );
+
+    if (word && word.id !== wordId) {
+      throw new BadRequestException('Word with this data already exists');
     }
 
     if (

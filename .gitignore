@@ -2,4 +2,6 @@
 /english-api/dist
 /english-api/.env
 
+/client/node_modules
+
 

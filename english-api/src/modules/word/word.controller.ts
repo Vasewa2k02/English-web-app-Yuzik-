@@ -17,6 +17,7 @@ import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { swaggerType } from 'src/helpers/swagger/utils';
 import { WordResponse } from './response/word.response';
+import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
 
 @ApiTags('word')
 @Controller('word')
@@ -30,7 +31,7 @@ export class WordController {
     @Req() req: RequestWithUser,
     @Param('id') dictionaryId: string,
     @Body() createWordDto: CreateWordDto,
-  ): Promise<void> {
+  ): Promise<WordForDictionaryResponse> {
     return this.wordService.createWord(
       +req.user.id,
       +dictionaryId,

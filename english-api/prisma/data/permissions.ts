@@ -12,6 +12,31 @@ export const permissions = [
     roleId: 2,
   },
   {
+    method: Method.POST,
+    descriptor: 'AuthController',
+    roleId: 1,
+    context: 'logout',
+  },
+  {
+    method: Method.POST,
+    descriptor: 'AuthController',
+    roleId: 2,
+    context: 'logout',
+  },
+
+  {
+    method: Method.POST,
+    descriptor: 'AuthController',
+    roleId: 1,
+    context: 'refresh',
+  },
+  {
+    method: Method.POST,
+    descriptor: 'AuthController',
+    roleId: 2,
+    context: 'refresh',
+  },
+  {
     method: Method.GET,
     descriptor: 'UserController',
     roleId: 1,

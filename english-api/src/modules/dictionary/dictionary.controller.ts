@@ -29,7 +29,7 @@ export class DictionaryController {
   public createDictionary(
     @Req() req: RequestWithUser,
     @Body() createDictionaryDto: CreateDictionaryDto,
-  ): Promise<void> {
+  ): Promise<DictionaryResponse> {
     return this.dictionaryService.createDictionary(
       +req.user.id,
       createDictionaryDto,

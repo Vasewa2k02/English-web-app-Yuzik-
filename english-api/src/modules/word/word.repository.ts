@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
 import { WordResponse } from './response/word.response';
 
 @Injectable()
@@ -28,8 +29,8 @@ export class WordRepository {
   public async createWord(
     dictionaryId: number,
     createWordDto: CreateWordDto,
-  ): Promise<void> {
-    await this.db.word.upsert({
+  ): Promise<WordForDictionaryResponse> {
+    return await this.db.word.upsert({
       where: {
         englishSpelling_russianSpelling: {
           englishSpelling: createWordDto.englishSpelling,
@@ -45,6 +46,7 @@ export class WordRepository {
         },
       },
       update: {
+        ...createWordDto,
         dictionaries: {
           connect: {
             id: dictionaryId,
@@ -58,6 +60,21 @@ export class WordRepository {
     return await this.db.word.findUnique({
       where: {
         id,
+      },
+      select: this.fullWordSelect,
+    });
+  }
+
+  public async getWord(
+    englishSpelling: string,
+    russianSpelling: string,
+  ): Promise<WordResponse> {
+    return await this.db.word.findUnique({
+      where: {
+        englishSpelling_russianSpelling: {
+          englishSpelling,
+          russianSpelling,
+        },
       },
       select: this.fullWordSelect,
     });

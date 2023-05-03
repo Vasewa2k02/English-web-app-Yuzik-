@@ -12,8 +12,8 @@ export class DictionaryService {
   public async createDictionary(
     creatorId: number,
     createDictionaryDto: CreateDictionaryDto,
-  ): Promise<void> {
-    await this.dictionaryRepository.createDictionary(
+  ): Promise<DictionaryResponse> {
+    return await this.dictionaryRepository.createDictionary(
       creatorId,
       createDictionaryDto,
     );

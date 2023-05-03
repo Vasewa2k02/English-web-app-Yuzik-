@@ -28,12 +28,13 @@ export class DictionaryRepository {
   public async createDictionary(
     creatorId: number,
     createDictionaryDto: CreateDictionaryDto,
-  ): Promise<void> {
-    await this.db.dictionary.create({
+  ): Promise<DictionaryResponse> {
+    return await this.db.dictionary.create({
       data: {
         creatorId,
         ...createDictionaryDto,
       },
+      select: this.fullDictionarySelect,
     });
   }
 

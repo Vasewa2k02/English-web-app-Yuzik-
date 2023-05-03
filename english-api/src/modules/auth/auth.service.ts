@@ -127,6 +127,8 @@ export class AuthService {
   }
 
   public async refresh(req: RequestWithUser): Promise<AccessTokenResponse> {
+    console.log(req.user);
+
     const accessToken = this.getAccessJwtToken(req.user.id);
 
     const { refreshTokenCookie, token: refreshToken } =

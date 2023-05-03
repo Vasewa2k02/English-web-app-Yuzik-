@@ -1,0 +1,10 @@
+.margin-top-30 {
+  margin-top: 30px;
+}
+
+.all-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 700px;
+}

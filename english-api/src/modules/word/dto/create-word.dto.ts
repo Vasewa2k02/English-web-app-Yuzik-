@@ -3,7 +3,7 @@ import { Matches } from 'class-validator';
 
 export class CreateWordDto {
   @ApiProperty()
-  @Matches(/^.{1,30}$/)
+  @Matches(/^[a-z-]{1,30}$/)
   englishSpelling: string;
 
   @ApiProperty()
@@ -11,7 +11,7 @@ export class CreateWordDto {
   transcription: string;
 
   @ApiProperty()
-  @Matches(/^.{1,30}$/)
+  @Matches(/^[а-я-]{1,30}$/)
   russianSpelling: string;
 
   @ApiProperty()
