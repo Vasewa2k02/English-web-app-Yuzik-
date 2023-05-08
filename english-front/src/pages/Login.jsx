@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Input from "../components/Input";
 import { Context } from "../index";
-import { login } from "../api-requests/user-api";
+import { getUserSettings, login } from "../api-requests/user-api";
 import { ROUTES } from "../utils/urls";
 import { REGEXES } from "../utils/regexes";
 import { Button } from "react-bootstrap";
 
 import "../styles/common.css";
+import { ROLES } from "../utils/roles";
 
 const Login = observer(() => {
   const navigate = useNavigate();
   const { user } = useContext(Context);
+  const { userSettings } = useContext(Context);
   const [loginDto, setLoginDto] = useState({
     email: "",
     password: "",
@@ -36,6 +38,11 @@ const Login = observer(() => {
       const data = await login(loginDto.email, loginDto.password);
       user.setUser(data);
       user.setRoleId(data.roleId);
+      
+      if (user.getRoleId() === ROLES.USER) {
+        const _userSettings = await getUserSettings();
+        userSettings.setUserSettings(_userSettings);
+      }
       navigate(ROUTES.DICTIONARY_ROUTE);
     } catch (err) {
       console.log(err);

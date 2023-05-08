@@ -9,11 +9,13 @@ import { Button } from "primereact/button";
 
 import "../styles/common.css";
 import "../styles/registration.css";
+import { Dialog } from "primereact/dialog";
 
 const Registration = observer(() => {
   const navigate = useNavigate();
   const [isValidName, setIsValidName] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
+  const [isRegisterDisabled, setIsRegisterDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [registrationDto, setRegistrationDto] = useState({
     email: "",
@@ -35,6 +37,7 @@ const Registration = observer(() => {
 
   const handleClick = async (e) => {
     e.preventDefault();
+    setIsRegisterDisabled(true);
 
     try {
       await registration(registrationDto.email, registrationDto.name);
@@ -42,13 +45,9 @@ const Registration = observer(() => {
     } catch (err) {
       if (err.response.status === 409) {
         setIsValidCredentials(false);
+        setIsRegisterDisabled(false);
       }
     }
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    navigate(ROUTES.LOGIN_ROUTE);
   };
 
   return (
@@ -77,21 +76,23 @@ const Registration = observer(() => {
         <Button
           className="btn-primary"
           label="Зарегистрироваться"
-          disabled={!isValidName || !isValidEmail}
+          disabled={!isValidName || !isValidEmail || isRegisterDisabled}
           onClick={handleClick}
         />
         {!isValidCredentials && <p>Такой пользователь уже существует</p>}
       </form>
-      {showModal && (
-        <div>
-          <p>
-            Ваш пароль отправлен на почту {registrationDto.email}. Для первого
-            входа в аккаунт используйте его. В настройках аккаунта вы сможете
-            изменить пароль.
-          </p>
-          <Button label="Вход" onClick={handleCloseModal} />
-        </div>
-      )}
+      <Dialog
+        header="Ошибка"
+        visible={showModal}
+        style={{ width: "50vw" }}
+        onHide={() => navigate(ROUTES.LOGIN_ROUTE)}
+      >
+        <p className="m-0">
+          Ваш пароль отправлен на почту {registrationDto.email}. Для первого
+          входа в аккаунт используйте его. В настройках аккаунта вы сможете
+          изменить пароль.
+        </p>
+      </Dialog>
     </div>
   );
 });

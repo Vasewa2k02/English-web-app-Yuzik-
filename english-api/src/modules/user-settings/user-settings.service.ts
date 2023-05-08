@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserSettingDto } from './dto/create-user-setting.dto';
-import { UpdateUserSettingDto } from './dto/update-user-setting.dto';
+import { UpdateUserSettingsDto } from './dto/update-user-setting.dto';
+import { UserSettingsResponse } from './response/user-settings.response';
+import { UserSettingsRepository } from './user-settings.repository';
 
 @Injectable()
 export class UserSettingsService {
-  create(createUserSettingDto: CreateUserSettingDto) {
-    return 'This action adds a new userSetting';
+  constructor(
+    private readonly userSettingsRepository: UserSettingsRepository,
+  ) {}
+
+  async getUserSettings(userId: number): Promise<UserSettingsResponse> {
+    return await this.userSettingsRepository.getUserSettings(userId);
   }
 
-  findAll() {
-    return `This action returns all userSettings`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} userSetting`;
-  }
-
-  update(id: number, updateUserSettingDto: UpdateUserSettingDto) {
-    return `This action updates a #${id} userSetting`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} userSetting`;
+  async update(
+    userId: number,
+    updateUserSettingsDto: UpdateUserSettingsDto,
+  ): Promise<void> {
+    await this.userSettingsRepository.update(userId, updateUserSettingsDto);
   }
 }

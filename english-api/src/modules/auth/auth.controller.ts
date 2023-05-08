@@ -32,8 +32,6 @@ export class AuthController {
   public registration(
     @Body() registrationDto: UserRegistrationDto,
   ): Promise<void> {
-    console.log('registrationDto ', registrationDto);
-
     return this.authService.registration(registrationDto);
   }
 
@@ -50,9 +48,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get()
   public getCurrentUser(@Req() req: RequestWithUser) {
-    console.log('req');
-    console.log(req);
-
     return this.authService.getCurrentUser(req);
   }
 

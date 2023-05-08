@@ -28,10 +28,34 @@ const NavBar = observer(() => {
         label: "Просмотреть",
         icon: "pi pi-fw pi-file-word",
         command: () => {
-          navigate(ROUTES.DICTIONARY_USER_ROUTE);
+          navigate(ROUTES.DICTIONARY_REVIEW_ROUTE);
         },
       },
     ],
+  };
+
+  const adminDictionariesItem = {
+    label: "Словари",
+    icon: "pi pi-fw pi-file-edit",
+    command: () => {
+      navigate(ROUTES.DICTIONARY_ROUTE);
+    },
+  };
+
+  const adminLessonsItem = {
+    label: "Уроки",
+    icon: "pi pi-fw pi-pencil",
+    command: () => {
+      navigate(ROUTES.LESSON_ADMIN_ROUTE);
+    },
+  };
+
+  const personalCabinetItem = {
+    label: "Личный кабинет",
+    icon: "pi pi-fw pi-user",
+    command: () => {
+      navigate(ROUTES.PERSONAL_CABINET_ROUTE);
+    },
   };
 
   const loginItem = {
@@ -67,9 +91,9 @@ const NavBar = observer(() => {
         className="navbar"
         model={
           user.getRoleId() === ROLES.USER
-            ? [dictionariesItem, logoutItem]
+            ? [personalCabinetItem, dictionariesItem, logoutItem]
             : user.getRoleId() === ROLES.ADMIN
-            ? [dictionariesItem, logoutItem]
+            ? [adminDictionariesItem, adminLessonsItem, logoutItem]
             : [registerItem, loginItem]
         }
       />

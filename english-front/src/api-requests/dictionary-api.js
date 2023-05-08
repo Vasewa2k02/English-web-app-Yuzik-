@@ -6,6 +6,16 @@ export const getUserDictionaries = async () => {
   return data;
 };
 
+export const getAdminDictionaries = async () => {
+  const { data } = await $authHost.get(ROUTES.DICTIONARY_ADMIN_ROUTE);
+  return data;
+};
+
+export const getDictionariesReview = async () => {
+  const { data } = await $authHost.get(ROUTES.DICTIONARY_REVIEW_ROUTE);
+  return data;
+};
+
 export const createDictionary = async ({ name, description }) => {
   const { data } = await $authHost.post(ROUTES.DICTIONARY_ROUTE, {
     name,

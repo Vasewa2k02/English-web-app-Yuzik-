@@ -42,3 +42,16 @@ export const getCurrentUser = async () => {
     }
   }
 };
+
+export const changePassword = async (oldPassword, newPassword) => {
+  await $authHost.patch(ROUTES.USER_ROUTE, { oldPassword, newPassword });
+};
+
+export const getUserSettings = async () => {
+  const { data } = await $authHost.get(ROUTES.USER_SETTINGS_ROUTE);
+  return data;
+};
+
+export const updateUserSettings = async (userSettings) => {
+  await $authHost.patch(ROUTES.USER_SETTINGS_ROUTE, { ...userSettings });
+};

@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
 
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -16,7 +15,6 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 import { observer } from "mobx-react-lite";
-import { getUserDictionaries } from "../api-requests/dictionary-api";
 import { updateWord } from "../api-requests/word-api";
 import "../styles/common.css";
 import "../styles/dictionary-page.css";
@@ -26,10 +24,32 @@ import { REGEXES } from "../utils/regexes";
 import * as dictionaryApi from "../api-requests/dictionary-api";
 import * as wordApi from "../api-requests/word-api";
 import { validateDto } from "../utils/helpers";
+import { Toast } from "primereact/toast";
+import { Context } from "..";
+import { ROLES } from "../utils/roles";
 
 const Dictionary = observer(() => {
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState("");
+  const { user } = useContext(Context);
+  const toast = useRef(null);
+
+  const showSuccess = (message) => {
+    toast.current.show({
+      severity: "success",
+      summary: "Успешно",
+      detail: message,
+      life: 3000,
+    });
+  };
+
+  const showError = (message) => {
+    toast.current.show({
+      severity: "error",
+      summary: "Ошибка",
+      detail:
+        message || "Вы ввели неверные данные или данные на странице устарели",
+      life: 3000,
+    });
+  };
 
   const [dictionaries, setDictionaries] = useState(null);
   const [dictionaryFilters, setDictionaryFilters] = useState({
@@ -51,20 +71,14 @@ const Dictionary = observer(() => {
 
   const loadData = async () => {
     try {
-      const _dictionaries = await getUserDictionaries();
+      const _dictionaries =
+        user.getRoleId() === ROLES.USER
+          ? await dictionaryApi.getUserDictionaries()
+          : await dictionaryApi.getAdminDictionaries();
       setDictionaries(_dictionaries);
       setSelectedDictionary(_dictionaries[0]);
       setWords(_dictionaries[0].words);
     } catch (error) {}
-  };
-
-  const notifyError = (errorMessage) => {
-    setDialogMessage(
-      errorMessage
-        ? errorMessage
-        : "Вы ввели неверные данные или данные на странице устарели"
-    );
-    setDialogVisible(true);
   };
 
   const initFilters = () => {
@@ -148,8 +162,8 @@ const Dictionary = observer(() => {
         description: "",
       });
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -160,7 +174,7 @@ const Dictionary = observer(() => {
 
     for (const prop in _dictionaryDto) {
       if (!dictionaryRegexes[prop].test(_dictionaryDto[prop])) {
-        notifyError("Вы ввели неверные данные");
+        showError("Вы ввели неверные данные");
         return;
       }
     }
@@ -170,8 +184,8 @@ const Dictionary = observer(() => {
       _dictionaries[index] = newData;
       setDictionaries(_dictionaries);
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -191,8 +205,8 @@ const Dictionary = observer(() => {
       setSelectedDictionary(null);
       setWords(null);
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -240,7 +254,7 @@ const Dictionary = observer(() => {
     e.preventDefault();
 
     if (selectedDictionary === null) {
-      notifyError(
+      showError(
         "Вы не выбрали словарь в который хотите добавить слово! Это можно сделать кликнув на нужный словарь."
       );
       return;
@@ -273,8 +287,8 @@ const Dictionary = observer(() => {
         description: "",
       });
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -285,7 +299,7 @@ const Dictionary = observer(() => {
 
       for (const prop in _wordDto) {
         if (!wordRegexes[prop].test(_wordDto[prop])) {
-          notifyError("Вы ввели неверные данные");
+          showError("Вы ввели неверные данные");
           return;
         }
       }
@@ -300,8 +314,8 @@ const Dictionary = observer(() => {
       setDictionaries(_dictionaries);
       setWords(_dictionaries[_dictionaryIndex].words);
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -323,8 +337,8 @@ const Dictionary = observer(() => {
       setDictionaries(_dictionaries);
       setWords(_dictionaries[_dictionaryIndex].words);
     } catch (error) {
+      showError();
       await loadData();
-      notifyError();
     }
   };
 
@@ -341,7 +355,8 @@ const Dictionary = observer(() => {
   const wordHeader = renderHeader(wordFilterValue, wordFilterChange);
 
   return (
-    <div className="container">
+    <div className="dictionary-container">
+      <Toast ref={toast} />
       <div className="tables">
         <DataTable
           className="card"
@@ -458,7 +473,7 @@ const Dictionary = observer(() => {
             errorMessage="Некорректное описание"
           />
           <Button
-            className="dictionary-create-submit"
+            className="dictionary-fields__button"
             label="Добавить"
             onClick={createDictionary}
           />
@@ -502,20 +517,12 @@ const Dictionary = observer(() => {
             errorMessage="До 30 символов"
           />
           <Button
-            className="dictionary-create-submit word-fields__button"
+            className="word-fields__button"
             label="Добавить"
             onClick={createWord}
           />
         </div>
       </div>
-      <Dialog
-        header="Ошибка"
-        visible={dialogVisible}
-        style={{ width: "50vw" }}
-        onHide={() => setDialogVisible(false)}
-      >
-        <p className="m-0">{dialogMessage}</p>
-      </Dialog>
     </div>
   );
 });

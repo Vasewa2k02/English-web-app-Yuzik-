@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { LearningMode, User } from '@prisma/client';
 
 import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -43,6 +43,14 @@ export class UserRepository {
       data: {
         ...createUserDto,
         password: hashedPassword,
+        settings: {
+          create: {
+            countRepeatWordForLearned: 4,
+            countRepeatWordsSimultaneously: 20,
+            learningModeWords: LearningMode.COMBINED,
+            learningModeTasks: LearningMode.COMBINED,
+          },
+        },
       },
       select: this.fullUserSelect,
     });

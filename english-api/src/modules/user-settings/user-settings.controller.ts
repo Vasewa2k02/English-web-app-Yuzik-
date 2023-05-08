@@ -1,47 +1,39 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserSettingsService } from './user-settings.service';
-import { CreateUserSettingDto } from './dto/create-user-setting.dto';
-import { UpdateUserSettingDto } from './dto/update-user-setting.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { UpdateUserSettingsDto } from './dto/update-user-setting.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { UserSettingsResponse } from './response/user-settings.response';
 
 @ApiTags('user-settings')
 @Controller('user-settings')
 export class UserSettingsController {
   constructor(private readonly userSettingsService: UserSettingsService) {}
 
-  @Post()
-  create(@Body() createUserSettingDto: CreateUserSettingDto) {
-    return this.userSettingsService.create(createUserSettingDto);
-  }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.userSettingsService.findAll();
+  getUserSettings(@Req() req: RequestWithUser): Promise<UserSettingsResponse> {
+    return this.userSettingsService.getUserSettings(+req.user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userSettingsService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch()
   update(
-    @Param('id') id: string,
-    @Body() updateUserSettingDto: UpdateUserSettingDto,
-  ) {
-    return this.userSettingsService.update(+id, updateUserSettingDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userSettingsService.remove(+id);
+    @Req() req: RequestWithUser,
+    @Body() updateUserSettingsDto: UpdateUserSettingsDto,
+  ): Promise<void> {
+    return this.userSettingsService.update(+req.user.id, updateUserSettingsDto);
   }
 }

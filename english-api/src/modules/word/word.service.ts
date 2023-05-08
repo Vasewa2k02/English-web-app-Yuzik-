@@ -4,7 +4,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { Word } from '@prisma/client';
+import { Dictionary, Word } from '@prisma/client';
 import { DictionaryService } from '../dictionary/dictionary.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
@@ -25,6 +25,21 @@ export class WordService {
     createWordDto: CreateWordDto,
   ): Promise<WordForDictionaryResponse> {
     await this.dictionaryService.checkDictionaryOwner(dictionaryId, userId);
+
+    const word = await this.wordRepository.getWord(
+      createWordDto.englishSpelling,
+      createWordDto.russianSpelling,
+    );
+
+    if (
+      word &&
+      word.dictionaries.find((item: Dictionary) => item.id === dictionaryId)
+    ) {
+      throw new BadRequestException(
+        'This word already exists in this dictionary',
+      );
+    }
+
     return await this.wordRepository.createWord(dictionaryId, createWordDto);
   }
 

@@ -6,39 +6,44 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { TaskResponse } from './response/task.response';
+import { swaggerType } from 'src/helpers/swagger/utils';
 
 @ApiTags('task')
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(TaskResponse))
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  createLesson(@Body() сreateTaskDto: CreateTaskDto): Promise<TaskResponse> {
+    return this.taskService.createTask(сreateTaskDto);
   }
 
-  @Get()
-  findAll() {
-    return this.taskService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
-  }
-
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(TaskResponse))
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
+  public updateLesson(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<TaskResponse> {
+    return this.taskService.updateTask(+id, updateTaskDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
+  public remove(@Param('id') id: string): Promise<void> {
+    return this.taskService.removeTask(+id);
   }
 }

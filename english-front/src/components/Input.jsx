@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { InputText } from "primereact/inputtext";
+import { Message } from "primereact/message";
 
 import "../styles/input.css";
 
@@ -21,13 +22,14 @@ const Input = (props) => {
         placeholder={props.placeholder}
         onChange={changeHandler}
       />
-      <label
-        className={
-          props.isValidValue ? "error-message-default" : "error-message"
-        }
-      >
-        {props.errorMessage || "Неверный формат данных"}
-      </label>
+      {!props.isValidValue && (
+        <div className="error-message">
+          <Message
+            severity="error"
+            text={props.errorMessage || "Неверный формат данных"}
+          />
+        </div>
+      )}
     </div>
   );
 };

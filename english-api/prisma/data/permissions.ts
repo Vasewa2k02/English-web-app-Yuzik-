@@ -124,4 +124,50 @@ export const permissions = [
     descriptor: 'WordController',
     roleId: 2,
   },
+  {
+    method: Method.GET,
+    descriptor: 'UserSettingsController',
+    roleId: 1,
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'UserSettingsController',
+    roleId: 1,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'LessonController',
+    roleId: 2,
+  },
+  {
+    method: Method.GET,
+    descriptor: 'LessonController',
+    roleId: 2,
+    context: 'getAdminLessons',
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'LessonController',
+    roleId: 2,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'LessonController',
+    roleId: 2,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'TaskController',
+    roleId: 2,
+  },
+  {
+    method: Method.PATCH,
+    descriptor: 'TaskController',
+    roleId: 2,
+  },
+  {
+    method: Method.DELETE,
+    descriptor: 'TaskController',
+    roleId: 2,
+  },
 ];

@@ -50,8 +50,8 @@ model Lesson {
 
 model Task {
   id              Int               @id @default(autoincrement())
-  name            String
-  description     String
+  englishSentence String            @map("english_sentence")
+  russianSentence String            @map("russian_sentence")
   lessonId        Int               @map("lesson_id")
   lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   grammarProgress GrammarProgress[]

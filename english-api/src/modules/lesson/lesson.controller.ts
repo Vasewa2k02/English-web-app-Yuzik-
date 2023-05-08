@@ -6,39 +6,55 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { LessonResponse } from './response/lesson.response';
+import { swaggerType } from 'src/helpers/swagger/utils';
 
 @ApiTags('lesson')
 @Controller('lesson')
 export class LessonController {
   constructor(private readonly lessonService: LessonService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createLessonDto: CreateLessonDto) {
-    return this.lessonService.create(createLessonDto);
+  createLesson(
+    @Body() createLessonDto: CreateLessonDto,
+  ): Promise<LessonResponse> {
+    return this.lessonService.createLesson(createLessonDto);
   }
 
-  @Get()
-  findAll() {
-    return this.lessonService.findAll();
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(LessonResponse))
+  @UseGuards(JwtAuthGuard)
+  @Get('admin')
+  public getAdminLessons(): Promise<LessonResponse[]> {
+    return this.lessonService.getAdminLessons();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lessonService.findOne(+id);
-  }
-
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(LessonResponse))
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
-    return this.lessonService.update(+id, updateLessonDto);
+  public updateLesson(
+    @Param('id') id: string,
+    @Body() updateLessonDto: UpdateLessonDto,
+  ): Promise<LessonResponse> {
+    return this.lessonService.updateLesson(+id, updateLessonDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lessonService.remove(+id);
+  public remove(@Param('id') id: string): Promise<void> {
+    return this.lessonService.removeLesson(+id);
   }
 }

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
+import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
 
 @Injectable()
@@ -21,6 +22,28 @@ export class DictionaryRepository {
         transcription: true,
         russianSpelling: true,
         description: true,
+      },
+    },
+  };
+
+  private dictionariesReviewSelect = {
+    id: true,
+    name: true,
+    description: true,
+    creatorId: true,
+    words: {
+      select: {
+        id: true,
+        englishSpelling: true,
+        transcription: true,
+        russianSpelling: true,
+        description: true,
+        lexiconProgress: {
+          select: {
+            progressCount: true,
+            isLearned: true,
+          },
+        },
       },
     },
   };
@@ -57,6 +80,39 @@ export class DictionaryRepository {
         creatorId,
       },
       select: this.fullDictionarySelect,
+    });
+  }
+
+  public async getDictionariesReview(creatorId: number): Promise<any[]> {
+    return await this.db.dictionary.findMany({
+      where: {
+        OR: [{ creatorId }, { user: { roleId: 2 } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        creatorId: true,
+        words: {
+          select: {
+            id: true,
+            englishSpelling: true,
+            transcription: true,
+            russianSpelling: true,
+            description: true,
+            lexiconProgress: {
+              where: {
+                userId: creatorId,
+              },
+              select: {
+                progressCount: true,
+                isLearned: true,
+              },
+              take: 1,
+            },
+          },
+        },
+      },
     });
   }
 

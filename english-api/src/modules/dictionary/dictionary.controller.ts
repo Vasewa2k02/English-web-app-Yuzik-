@@ -16,6 +16,7 @@ import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { DictionaryService } from './dictionary.service';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
+import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
 
 @ApiTags('dictionary')
@@ -62,6 +63,16 @@ export class DictionaryController {
     @Req() req: RequestWithUser,
   ): Promise<DictionaryResponse[]> {
     return this.dictionaryService.getDictionariesForLearn(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
+  @Get('review')
+  public getDictionariesReview(
+    @Req() req: RequestWithUser,
+  ): Promise<DictionaryReviewResponse[]> {
+    return this.dictionaryService.getDictionariesReview(+req.user.id);
   }
 
   @ApiBearerAuth()

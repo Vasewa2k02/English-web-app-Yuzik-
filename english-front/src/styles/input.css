@@ -17,14 +17,6 @@
   border: 1px solid red;
 }
 
-.error-message-default,
 .error-message {
-  margin: 5px 7px;
-  color: white;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.error-message {
-  color: red;
+  margin-top: 10px;
 }

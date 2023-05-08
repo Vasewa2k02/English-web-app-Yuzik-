@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { LessonRepository } from './lesson.repository';
+import { LessonResponse } from './response/lesson.response';
 
 @Injectable()
 export class LessonService {
-  create(createLessonDto: CreateLessonDto) {
-    return 'This action adds a new lesson';
+  constructor(private readonly lessonRepository: LessonRepository) {}
+
+  async createLesson(
+    createLessonDto: CreateLessonDto,
+  ): Promise<LessonResponse> {
+    return await this.lessonRepository.createLesson(createLessonDto);
   }
 
-  findAll() {
-    return `This action returns all lesson`;
+  async getAdminLessons(): Promise<LessonResponse[]> {
+    return await this.lessonRepository.getAdminLessons();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} lesson`;
+  async updateLesson(
+    id: number,
+    updateLessonDto: UpdateLessonDto,
+  ): Promise<LessonResponse> {
+    await this.checkLessonExistence(id);
+    return await this.lessonRepository.updateLesson(id, updateLessonDto);
   }
 
-  update(id: number, updateLessonDto: UpdateLessonDto) {
-    return `This action updates a #${id} lesson`;
+  async removeLesson(id: number): Promise<void> {
+    await this.checkLessonExistence(id);
+    await this.lessonRepository.removeLesson(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} lesson`;
+  private async checkLessonExistence(id: number): Promise<void> {
+    const lesson = await this.lessonRepository.getLessonById(id);
+
+    if (!lesson) {
+      throw new NotFoundException('This lesson doesn`t exist');
+    }
   }
 }

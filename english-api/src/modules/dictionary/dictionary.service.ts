@@ -3,6 +3,7 @@ import { Dictionary } from '@prisma/client';
 import { DictionaryRepository } from './dictionary.repository';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
+import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
 
 @Injectable()
@@ -33,6 +34,12 @@ export class DictionaryService {
     return (await this.dictionaryRepository.getAdminDictionaries()).concat(
       await this.dictionaryRepository.getUserDictionaries(id),
     );
+  }
+
+  public async getDictionariesReview(
+    id: number,
+  ): Promise<DictionaryReviewResponse[]> {
+    return await this.dictionaryRepository.getDictionariesReview(id);
   }
 
   public async updateDictionary(

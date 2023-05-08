@@ -56,16 +56,15 @@ export class UserService {
     user: User,
     updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<void> {
+    console.log(await this.userRepository.getHashedUserPassword(user.id));
+
     if (
       !(await bcrypt.compare(
         updateUserPasswordDto.oldPassword,
         await this.userRepository.getHashedUserPassword(user.id),
       ))
     ) {
-      throw new HttpException(
-        'Old and new passwords not matches',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Passwords not matches', HttpStatus.BAD_REQUEST);
     }
 
     await this.userRepository.updateUserPassword(
