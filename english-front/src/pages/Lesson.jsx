@@ -279,9 +279,8 @@ const Lesson = observer(() => {
       id: e.value.id,
       englishSentence: e.value.englishSentence,
       russianSentence: e.value.russianSentence,
-      lessonId: e.value.lessonId,
+      lessonId: selectedLesson.id,
     });
-    changeTaskHandler({ id: "lessonId", value: e.value.id });
   };
 
   const changeTaskHandler = ({ id, value }) => {

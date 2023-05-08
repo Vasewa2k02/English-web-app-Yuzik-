@@ -2,7 +2,6 @@ import { $authHost } from "./index";
 import { ROUTES } from "../utils/urls";
 
 export const createTask = async (createTaskDto) => {
-  console.log(createTaskDto);
   const { data } = await $authHost.post(ROUTES.TASK_ROUTE, createTaskDto);
   return data;
 };
