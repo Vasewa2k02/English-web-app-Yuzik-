@@ -28,18 +28,26 @@ export class DictionaryService {
     return await this.dictionaryRepository.getUserDictionaries(id);
   }
 
-  public async getDictionariesForLearn(
-    id: number,
-  ): Promise<DictionaryResponse[]> {
-    return (await this.dictionaryRepository.getAdminDictionaries()).concat(
-      await this.dictionaryRepository.getUserDictionaries(id),
-    );
-  }
-
   public async getDictionariesReview(
     id: number,
   ): Promise<DictionaryReviewResponse[]> {
     return await this.dictionaryRepository.getDictionariesReview(id);
+  }
+
+  public async getDictionariesLearn(
+    id: number,
+  ): Promise<DictionaryReviewResponse[]> {
+    const data = await this.dictionaryRepository.getDictionariesLearn(id);
+
+    data.forEach((dictionary) => {
+      dictionary.words = dictionary.words.filter(
+        (word) =>
+          word.lexiconProgress[0] === undefined ||
+          word.lexiconProgress[0].isLearned === false,
+      );
+    });
+
+    return data;
   }
 
   public async updateDictionary(

@@ -16,6 +16,7 @@ model User {
   email           String            @unique
   password        String
   roleId          Int               @default(1) @map("role_id")
+  idEnableLesson  Int               @default(1) @map("id_enable_lesson")
   role            Role              @relation(fields: [roleId], references: [id], onDelete: Cascade)
   session         Session?
   grammarProgress GrammarProgress[]
@@ -66,6 +67,7 @@ model GrammarProgress {
   taskId Int  @map("task_id")
   task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, taskId])
   @@map("grammar_progresses")
 }
 
@@ -115,18 +117,20 @@ model LexiconProgress {
   wordId        Int     @map("word_id")
   word          Word    @relation(fields: [wordId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, wordId])
   @@map("lexicon_progresses")
 }
 
 model Statistics {
   id         Int      @id @default(autoincrement())
   date       DateTime
-  words      Int
-  tasks      Int
-  quizPoints Int      @map("quiz_points")
+  words      Int?
+  tasks      Int?
+  quizPoints Int?     @map("quiz_points")
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([date, userId])
   @@map("statistics")
 }
 

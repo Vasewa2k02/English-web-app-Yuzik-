@@ -16,6 +16,11 @@ export const getDictionariesReview = async () => {
   return data;
 };
 
+export const getDictionariesLearn = async () => {
+  const { data } = await $authHost.get(ROUTES.DICTIONARY_LEARN_ROUTE);
+  return data;
+};
+
 export const createDictionary = async ({ name, description }) => {
   const { data } = await $authHost.post(ROUTES.DICTIONARY_ROUTE, {
     name,

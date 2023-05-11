@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
+import { LexiconProgress } from '@prisma/client';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { CreateStatisticDto } from '../statistics/dto/create-statistic.dto';
+import { StatisticsService } from '../statistics/statistics.service';
 import { CreateLexiconProgressDto } from './dto/create-lexicon-progress.dto';
-import { UpdateLexiconProgressDto } from './dto/update-lexicon-progress.dto';
+import { LexiconProgressRepository } from './lexicon-progress.repository';
+import { LexiconProgressResponse } from './response/lexicon-progress.response';
 
 @Injectable()
 export class LexiconProgressService {
-  create(createLexiconProgressDto: CreateLexiconProgressDto) {
-    return 'This action adds a new lexiconProgress';
-  }
+  constructor(
+    private readonly lexiconProgressRepository: LexiconProgressRepository,
+    private readonly statisticsService: StatisticsService,
+  ) {}
 
-  findAll() {
-    return `This action returns all lexiconProgress`;
-  }
+  async createOrUpdateLexiconProgress(
+    req: RequestWithUser,
+    createLexiconProgressDto: CreateLexiconProgressDto,
+  ): Promise<LexiconProgressResponse> {
+    const lexiconProgress =
+      await this.lexiconProgressRepository.getLexiconProgress(
+        req.user.id,
+        createLexiconProgressDto.wordId,
+      );
 
-  findOne(id: number) {
-    return `This action returns a #${id} lexiconProgress`;
-  }
+    const progressCount = createLexiconProgressDto.isCorrectAnswer
+      ? lexiconProgress?.progressCount + 1 || 1
+      : 0;
 
-  update(id: number, updateLexiconProgressDto: UpdateLexiconProgressDto) {
-    return `This action updates a #${id} lexiconProgress`;
-  }
+    const idLearned =
+      progressCount >= req.user.settings.countRepeatWordForLearned;
 
-  remove(id: number) {
-    return `This action removes a #${id} lexiconProgress`;
+    return await this.lexiconProgressRepository.createOrUpdateLexiconProgress(
+      req.user.id,
+      createLexiconProgressDto.wordId,
+      progressCount,
+      idLearned,
+    );
   }
 }

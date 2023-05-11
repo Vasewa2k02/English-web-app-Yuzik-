@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGrammarProgressDto } from './dto/create-grammar-progress.dto';
 import { UpdateGrammarProgressDto } from './dto/update-grammar-progress.dto';
+import { GrammarProgressRepository } from './grammar-progress.repository';
 
 @Injectable()
 export class GrammarProgressService {
-  create(createGrammarProgressDto: CreateGrammarProgressDto) {
-    return 'This action adds a new grammarProgress';
+  constructor(
+    private readonly grammarProgressRepository: GrammarProgressRepository,
+  ) {}
+
+  public async getCountComplitedTasksInLesson(
+    userId: number,
+    lessonId: number,
+  ): Promise<number> {
+    return await this.grammarProgressRepository.getCountComplitedTasksInLesson(
+      userId,
+      lessonId,
+    );
   }
 
-  findAll() {
-    return `This action returns all grammarProgress`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} grammarProgress`;
-  }
-
-  update(id: number, updateGrammarProgressDto: UpdateGrammarProgressDto) {
-    return `This action updates a #${id} grammarProgress`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} grammarProgress`;
+  public async createOrUpdateGrammarProgress(
+    userId: number,
+    taskId: number,
+  ): Promise<void> {
+    await this.grammarProgressRepository.createOrUpdateGrammarProgress(
+      userId,
+      taskId,
+    );
   }
 }

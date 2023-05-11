@@ -116,6 +116,40 @@ export class DictionaryRepository {
     });
   }
 
+  public async getDictionariesLearn(creatorId: number): Promise<any[]> {
+    return await this.db.dictionary.findMany({
+      where: {
+        OR: [{ creatorId }, { user: { roleId: 2 } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        creatorId: true,
+        words: {
+          select: {
+            id: true,
+            englishSpelling: true,
+            transcription: true,
+            russianSpelling: true,
+            description: true,
+            lexiconProgress: {
+              where: {
+                userId: creatorId,
+              },
+              select: {
+                id: true,
+                progressCount: true,
+                isLearned: true,
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+  }
+
   public async getDictionaryById(id: number): Promise<DictionaryResponse> {
     return await this.db.dictionary.findUnique({
       where: {

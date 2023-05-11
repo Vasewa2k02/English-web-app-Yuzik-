@@ -4,12 +4,18 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import * as fs from 'fs';
+import * as https from 'https';
 
 import { AppModule } from '../src/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: true,
+    httpsOptions: {
+      key: fs.readFileSync('C:\\My\\OpenSSL\\CW.key'),
+      cert: fs.readFileSync('C:\\My\\OpenSSL\\CW.crt'),
+    },
   });
 
   app.useGlobalPipes(new ValidationPipe());

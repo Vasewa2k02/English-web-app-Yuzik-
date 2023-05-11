@@ -13,6 +13,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 import { UserSettingsModule } from './modules/user-settings/user-settings.module';
 import { LexiconProgressModule } from './modules/lexicon-progress/lexicon-progress.module';
 import { GrammarProgressModule } from './modules/grammar-progress/grammar-progress.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -32,6 +33,6 @@ import { GrammarProgressModule } from './modules/grammar-progress/grammar-progre
     GrammarProgressModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [AppGateway],
 })
 export class AppModule {}

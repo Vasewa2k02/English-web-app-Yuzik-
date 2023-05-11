@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "statistics" ALTER COLUMN "words" DROP NOT NULL,
+ALTER COLUMN "tasks" DROP NOT NULL,
+ALTER COLUMN "quiz_points" DROP NOT NULL;

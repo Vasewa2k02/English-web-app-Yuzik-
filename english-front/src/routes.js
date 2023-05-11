@@ -7,6 +7,8 @@ import Statistics from "./pages/Statistics";
 import NotFound from "./pages/NotFound";
 import PersonalCabinet from "./pages/PersonalCabinet";
 import Lesson from "./pages/Lesson";
+import LexiconProgress from "./pages/DictionaryLearn";
+import LessonLearn from "./pages/LessonLearn";
 
 export const userRoutes = [
   {
@@ -20,6 +22,15 @@ export const userRoutes = [
   {
     path: ROUTES.DICTIONARY_REVIEW_ROUTE,
     Component: DictionaryReview,
+  },
+  {
+    path: ROUTES.LEXICON_PROGRESS_ROUTE,
+    Component: LexiconProgress,
+  },
+  
+  {
+    path: ROUTES.GRAMMAR_PROGRESS_ROUTE,
+    Component: LessonLearn,
   },
 ];
 

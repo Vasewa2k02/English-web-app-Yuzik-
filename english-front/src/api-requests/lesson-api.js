@@ -6,6 +6,11 @@ export const getAdminLessons = async () => {
   return data;
 };
 
+export const getStudyLessons = async () => {
+  const { data } = await $authHost.get(ROUTES.LESSON_LEARN_ROUTE);
+  return data;
+};
+
 export const createLesson = async (createLessonDto) => {
   const { data } = await $authHost.post(ROUTES.LESSON_ROUTE, createLessonDto);
   return data;

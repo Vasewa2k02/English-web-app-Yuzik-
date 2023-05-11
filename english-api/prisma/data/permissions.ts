@@ -146,6 +146,12 @@ export const permissions = [
     context: 'getAdminLessons',
   },
   {
+    method: Method.GET,
+    descriptor: 'LessonController',
+    roleId: 1,
+    context: 'getLearnLessons',
+  },
+  {
     method: Method.PATCH,
     descriptor: 'LessonController',
     roleId: 2,
@@ -169,5 +175,26 @@ export const permissions = [
     method: Method.DELETE,
     descriptor: 'TaskController',
     roleId: 2,
+  },
+  {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+    context: 'getDictionariesLearn',
+  },
+  {
+    method: Method.POST,
+    descriptor: 'LexiconProgressController',
+    roleId: 1,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'StatisticsController',
+    roleId: 1,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'GrammarProgressController',
+    roleId: 1,
   },
 ];

@@ -58,21 +58,21 @@ export class DictionaryController {
   @ApiBearerAuth()
   @ApiOkResponse(swaggerType(DictionaryResponse))
   @UseGuards(JwtAuthGuard)
-  @Get('learn')
-  public getDictionariesForLearn(
-    @Req() req: RequestWithUser,
-  ): Promise<DictionaryResponse[]> {
-    return this.dictionaryService.getDictionariesForLearn(+req.user.id);
-  }
-
-  @ApiBearerAuth()
-  @ApiOkResponse(swaggerType(DictionaryResponse))
-  @UseGuards(JwtAuthGuard)
   @Get('review')
   public getDictionariesReview(
     @Req() req: RequestWithUser,
   ): Promise<DictionaryReviewResponse[]> {
     return this.dictionaryService.getDictionariesReview(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
+  @Get('learn')
+  public getDictionariesLearn(
+    @Req() req: RequestWithUser,
+  ): Promise<DictionaryReviewResponse[]> {
+    return this.dictionaryService.getDictionariesLearn(+req.user.id);
   }
 
   @ApiBearerAuth()

@@ -3,6 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { GrammarProgressService } from '../grammar-progress/grammar-progress.service';
+import { UserService } from '../user/user.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { LessonRepository } from './lesson.repository';
@@ -10,7 +13,11 @@ import { LessonResponse } from './response/lesson.response';
 
 @Injectable()
 export class LessonService {
-  constructor(private readonly lessonRepository: LessonRepository) {}
+  constructor(
+    private readonly lessonRepository: LessonRepository,
+    private readonly grammarProgressService: GrammarProgressService,
+    private readonly userService: UserService,
+  ) {}
 
   async createLesson(
     createLessonDto: CreateLessonDto,
@@ -20,6 +27,40 @@ export class LessonService {
 
   async getAdminLessons(): Promise<LessonResponse[]> {
     return await this.lessonRepository.getAdminLessons();
+  }
+
+  async getLearnLessons(req: RequestWithUser): Promise<LessonResponse[]> {
+    const userId = req.user.id;
+    const enableLesson = await this.lessonRepository.getLessonById(
+      req.user.idEnableLesson,
+    );
+    const nextEnableLesson = await this.lessonRepository.getNextLessonById(
+      req.user.idEnableLesson,
+    );
+    const countComplitedTasksInLesson =
+      await this.grammarProgressService.getCountComplitedTasksInLesson(
+        userId,
+        req.user.idEnableLesson,
+      );
+
+    if (
+      !enableLesson ||
+      (enableLesson.tasks.length !== 0 &&
+        (100 * countComplitedTasksInLesson) / enableLesson.tasks.length >=
+          enableLesson.passingPercent)
+    ) {
+      await this.userService.updateIdEnableLesson(
+        userId,
+        nextEnableLesson?.id || req.user.idEnableLesson,
+      );
+      return await this.lessonRepository.getLearnLessons(
+        nextEnableLesson?.id || req.user.idEnableLesson,
+      );
+    }
+
+    return await this.lessonRepository.getLearnLessons(
+      enableLesson?.id || req.user.idEnableLesson,
+    );
   }
 
   async updateLesson(

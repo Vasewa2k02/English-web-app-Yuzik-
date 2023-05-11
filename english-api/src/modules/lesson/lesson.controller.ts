@@ -43,6 +43,16 @@ export class LessonController {
   @ApiBearerAuth()
   @ApiOkResponse(swaggerType(LessonResponse))
   @UseGuards(JwtAuthGuard)
+  @Get('learn')
+  public getLearnLessons(
+    @Req() req: RequestWithUser,
+  ): Promise<LessonResponse[]> {
+    return this.lessonService.getLearnLessons(req);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(LessonResponse))
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   public updateLesson(
     @Param('id') id: string,

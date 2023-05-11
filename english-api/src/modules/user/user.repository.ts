@@ -13,12 +13,14 @@ export class UserRepository {
     id: true,
     email: true,
     roleId: true,
+    idEnableLesson: true,
   };
 
   private fullUserSelect = {
     id: true,
     email: true,
     roleId: true,
+    idEnableLesson: true,
     role: {
       select: {
         id: true,
@@ -31,6 +33,14 @@ export class UserRepository {
             context: true,
           },
         },
+      },
+    },
+    settings: {
+      select: {
+        countRepeatWordForLearned: true,
+        countRepeatWordsSimultaneously: true,
+        learningModeWords: true,
+        learningModeTasks: true,
       },
     },
   };
@@ -58,7 +68,7 @@ export class UserRepository {
 
   public async getAllUsers(): Promise<UserResponse[]> {
     return await this.db.user.findMany({
-      select: this.userSelect,
+      select: this.fullUserSelect,
     });
   }
 
@@ -67,7 +77,7 @@ export class UserRepository {
       where: {
         id,
       },
-      select: this.userSelect,
+      select: this.fullUserSelect,
     });
   }
 
@@ -76,7 +86,7 @@ export class UserRepository {
       where: {
         email,
       },
-      select: this.userSelect,
+      select: this.fullUserSelect,
     });
   }
 
@@ -93,9 +103,7 @@ export class UserRepository {
       where: {
         id,
       },
-      select: {
-        ...this.fullUserSelect,
-      },
+      select: this.fullUserSelect,
     });
   }
 
@@ -119,6 +127,17 @@ export class UserRepository {
     return await this.db.user.update({
       where: { id },
       data: { password },
+      select: this.fullUserSelect,
+    });
+  }
+
+  public async updateIdEnableLesson(
+    userId: number,
+    idEnableLesson: number,
+  ): Promise<void> {
+    await this.db.user.update({
+      where: { id: userId },
+      data: { idEnableLesson },
     });
   }
 }

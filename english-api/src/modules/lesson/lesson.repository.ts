@@ -42,8 +42,30 @@ export class LessonRepository {
     });
   }
 
+  public async getNextLessonById(id: number): Promise<LessonResponse> {
+    return await this.db.lesson.findFirst({
+      where: {
+        id: { gt: id },
+      },
+      orderBy: { id: 'asc' },
+      select: this.lessonWithTasksSelect,
+    });
+  }
+
   public async getAdminLessons(): Promise<LessonResponse[]> {
     return await this.db.lesson.findMany({
+      orderBy: { id: 'asc' },
+      select: this.lessonWithTasksSelect,
+    });
+  }
+
+  public async getLearnLessons(lessonId: number): Promise<LessonResponse[]> {
+    return await this.db.lesson.findMany({
+      where: {
+        id: {
+          lte: lessonId,
+        },
+      },
       select: this.lessonWithTasksSelect,
     });
   }

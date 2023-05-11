@@ -1,26 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStatisticDto } from './dto/create-statistic.dto';
-import { UpdateStatisticDto } from './dto/update-statistic.dto';
+import { StatisticsRepository } from './statistics.repository';
 
 @Injectable()
 export class StatisticsService {
-  create(createStatisticDto: CreateStatisticDto) {
-    return 'This action adds a new statistic';
-  }
+  constructor(private readonly statisticsRepository: StatisticsRepository) {}
 
-  findAll() {
-    return `This action returns all statistics`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} statistic`;
-  }
-
-  update(id: number, updateStatisticDto: UpdateStatisticDto) {
-    return `This action updates a #${id} statistic`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} statistic`;
+  async createOrUpdateStatistics(
+    userId: number,
+    createStatisticDto: CreateStatisticDto,
+  ): Promise<void> {
+    await this.statisticsRepository.createOrUpdateStatistics(
+      userId,
+      createStatisticDto,
+    );
   }
 }

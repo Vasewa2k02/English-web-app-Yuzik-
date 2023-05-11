@@ -1,16 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { GrammarProgressService } from './grammar-progress.service';
 import { CreateGrammarProgressDto } from './dto/create-grammar-progress.dto';
-import { UpdateGrammarProgressDto } from './dto/update-grammar-progress.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import RequestWithUser from '../auth/interface/request-with-user.interface';
 
 @ApiTags('grammar-progress')
 @Controller('grammar-progress')
@@ -19,31 +12,16 @@ export class GrammarProgressController {
     private readonly grammarProgressService: GrammarProgressService,
   ) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createGrammarProgressDto: CreateGrammarProgressDto) {
-    return this.grammarProgressService.create(createGrammarProgressDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.grammarProgressService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.grammarProgressService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateGrammarProgressDto: UpdateGrammarProgressDto,
-  ) {
-    return this.grammarProgressService.update(+id, updateGrammarProgressDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.grammarProgressService.remove(+id);
+  create(
+    @Req() req: RequestWithUser,
+    @Body() createGrammarProgressDto: CreateGrammarProgressDto,
+  ): Promise<void> {
+    return this.grammarProgressService.createOrUpdateGrammarProgress(
+      +req.user.id,
+      createGrammarProgressDto.taskId,
+    );
   }
 }

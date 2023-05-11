@@ -16,9 +16,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 import { observer } from "mobx-react-lite";
-import { updateTask } from "../api-requests/task-api";
-import "../styles/common.css";
-import "../styles/lesson-page.css";
+
 import Input from "../components/Input";
 import { REGEXES } from "../utils/regexes";
 
@@ -37,6 +35,9 @@ import {
   NOT_SELECTED_TASK,
   OLD_DATA,
 } from "../utils/error-messages";
+
+import "../styles/common.css";
+import "../styles/lesson-page.css";
 
 const Lesson = observer(() => {
   const toast = useRef(null);
@@ -209,11 +210,17 @@ const Lesson = observer(() => {
 
     try {
       await lessonApi.updateLesson(id, lessonDtoWithoutId);
-      _lessons[_lessons.findIndex((item) => item.id === id)] = lessonDto;
+
+      const _lessonIndex = _lessons.indexOf(selectedLesson);
+
+      _lessons[_lessonIndex].name = lessonDto.name;
+      _lessons[_lessonIndex].theory = lessonDto.theory;
+      _lessons[_lessonIndex].passingPercent = lessonDto.passingPercent;
+
       setLessons(_lessons);
       showSuccess("Урок изменён.");
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -290,6 +297,8 @@ const Lesson = observer(() => {
   const createTask = async (e) => {
     e.preventDefault();
 
+    console.log(e);
+
     if (selectedLesson === null) {
       showError(NOT_SELECTED_LESSON);
       return;
@@ -300,6 +309,7 @@ const Lesson = observer(() => {
     }
 
     try {
+      console.log(selectedLesson);
       const { id, ...taskDtoWithoutId } = taskDto;
       const createdTask = await taskApi.createTask(taskDtoWithoutId);
 
@@ -312,7 +322,7 @@ const Lesson = observer(() => {
       setTasks(_lessons[_index].tasks);
 
       setTaskDto({
-        id: selectedTask?.id | "",
+        id: selectedTask?.id || "",
         englishSentence: "",
         russianSentence: "",
         lessonId: selectedLesson.id,
@@ -377,8 +387,9 @@ const Lesson = observer(() => {
       await taskApi.deleteTask(id);
 
       const _lessons = [...lessons];
+      const _tasks = [...tasks];
       const _lessonIndex = _lessons.indexOf(selectedLesson);
-      const _taskIndex = tasks.indexOf((item) => item.id === id);
+      const _taskIndex = _tasks.findIndex((item) => item.id === id);
 
       _lessons[_lessonIndex].tasks.splice(_taskIndex, 1);
       setLessons(_lessons);

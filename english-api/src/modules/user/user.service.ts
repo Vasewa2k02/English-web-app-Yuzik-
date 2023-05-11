@@ -52,8 +52,18 @@ export class UserService {
     return await this.userRepository.getUserByIdWithPermissions(id);
   }
 
+  public async updateIdEnableLesson(
+    userId: number,
+    idEnableLesson: number,
+  ): Promise<void> {
+    return await this.userRepository.updateIdEnableLesson(
+      userId,
+      idEnableLesson,
+    );
+  }
+
   public async changeUserPassword(
-    user: User,
+    user: UserResponse,
     updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<void> {
     console.log(await this.userRepository.getHashedUserPassword(user.id));

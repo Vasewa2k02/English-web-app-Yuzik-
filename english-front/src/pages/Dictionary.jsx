@@ -330,7 +330,7 @@ const Dictionary = observer(() => {
       await wordApi.deleteWord(id, selectedDictionary.id);
       const _dictionaries = [...dictionaries];
       const _dictionaryIndex = _dictionaries.indexOf(selectedDictionary);
-      const _wordIndex = words.indexOf((item) => item.id === id);
+      const _wordIndex = words.findIndex((item) => item.id === id);
 
       _dictionaries[_dictionaryIndex].words.splice(_wordIndex, 1);
 

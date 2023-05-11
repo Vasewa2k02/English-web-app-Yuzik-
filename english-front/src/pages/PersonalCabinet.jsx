@@ -21,6 +21,7 @@ import { changePassword, updateUserSettings } from "../api-requests/user-api";
 
 import "../styles/personal-cabinet.css";
 import { Context } from "..";
+import { LearningMode } from "../utils/learn-settings";
 
 const PersonalCabinet = observer(() => {
   const toast = useRef(null);
@@ -106,9 +107,12 @@ const PersonalCabinet = observer(() => {
   };
 
   const learningModes = [
-    { name: "Перевод на русский", value: "TRANSLATE_FROM_ENGLISH" },
-    { name: "Перевод на английский", value: "TRANSLATE_FROM_RUSSIAN" },
-    { name: "Комбинированный вариант", value: "COMBINED" },
+    {
+      name: "Перевод с английского",
+      value: LearningMode.TRANSLATE_FROM_ENGLISH,
+    },
+    { name: "Перевод с русского", value: LearningMode.TRANSLATE_FROM_RUSSIAN },
+    { name: "Комбинированный вариант", value: LearningMode.COMBINED },
   ];
 
   const updateUserSettingsRequest = async () => {

@@ -16,7 +16,10 @@ const LESSON_THEORY_REGEX = /^.{1,5000}$/;
 const ENGLISH_SENTENCE_REGEX = /^[a-zA-Z.,:;!?'`— ]{2,300}$/;
 const RUSSIAN_SENTENCE_REGEX = /^[а-яА-Я.,:;!?'`— ]{2,300}$/;
 
+const PUNCTUATION_MARKS = /[.,:;!?\s]+/;
+
 export const REGEXES = {
+  PUNCTUATION_MARKS,
   EMAIL_REGEX,
   NAME_REGEX,
   PASSWORD_REGEX,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { LexiconProgressReviewResponse } from 'src/modules/lexicon-progress/response/lexicon-proggress-review.response';
+import { LexiconProgressResponse } from 'src/modules/lexicon-progress/response/lexicon-progress.response';
 import { WordForDictionaryResponse } from './word-for-dictionary.response';
 
 export class WordReviewResponse implements WordForDictionaryResponse {
@@ -19,5 +19,5 @@ export class WordReviewResponse implements WordForDictionaryResponse {
   description: string;
 
   @ApiProperty()
-  lexiconProgress: LexiconProgressReviewResponse;
+  lexiconProgress: LexiconProgressResponse;
 }
