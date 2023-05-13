@@ -73,6 +73,14 @@ const NavBar = observer(() => {
     },
   };
 
+  const statisticsItem = {
+    label: "Статистика",
+    icon: "pi pi-fw pi-chart-bar",
+    command: () => {
+      navigate(ROUTES.STATISTICS_ROUTE);
+    },
+  };
+
   const loginItem = {
     label: "Войти",
     icon: "pi pi-fw pi-sign-in",
@@ -108,6 +116,7 @@ const NavBar = observer(() => {
           user.getRoleId() === ROLES.USER
             ? [
                 personalCabinetItem,
+                statisticsItem,
                 dictionariesItem,
                 lessonLearnItem,
                 logoutItem,

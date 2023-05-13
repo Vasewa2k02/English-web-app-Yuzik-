@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Input from "../components/Input";
@@ -9,9 +9,12 @@ import { REGEXES } from "../utils/regexes";
 import { Button } from "react-bootstrap";
 
 import "../styles/common.css";
+import "../styles/login.css";
 import { ROLES } from "../utils/roles";
+import { Toast } from "primereact/toast";
 
 const Login = observer(() => {
+  const toast = useRef(null);
   const navigate = useNavigate();
   const { user } = useContext(Context);
   const { userSettings } = useContext(Context);
@@ -19,18 +22,26 @@ const Login = observer(() => {
     email: "",
     password: "",
   });
-  const [isValidCredentials, setIsValidCredentials] = useState(true);
+
+  const showError = (message, summary, life) => {
+    toast.current.show({
+      severity: "error",
+      summary: summary || "Ошибка",
+      detail:
+        message || "Вы ввели неверные данные или данные на странице устарели",
+      life: life || 3000,
+    });
+  };
 
   const changeCredentialsHandler = ({ id, value }) => {
     setLoginDto((prev) => ({ ...prev, [id]: value }));
-    setIsValidCredentials(true);
   };
 
   const handleClick = async (e) => {
     e.preventDefault();
 
     if (!REGEXES.EMAIL_REGEX.test(loginDto.email)) {
-      setIsValidCredentials(false);
+      showError("Неверные данные");
       return;
     }
 
@@ -38,7 +49,7 @@ const Login = observer(() => {
       const data = await login(loginDto.email, loginDto.password);
       user.setUser(data);
       user.setRoleId(data.roleId);
-      
+
       if (user.getRoleId() === ROLES.USER) {
         const _userSettings = await getUserSettings();
         userSettings.setUserSettings(_userSettings);
@@ -46,37 +57,36 @@ const Login = observer(() => {
       navigate(ROUTES.DICTIONARY_ROUTE);
     } catch (err) {
       console.log(err);
-      setIsValidCredentials(false);
+      showError("Неверные данные");
     }
   };
 
   return (
     <div className="all-center">
-      <form>
-        <h3>Авторизация</h3>
-        <Input
-          id="email"
-          value={loginDto.email}
-          lableText="Email"
-          inputType="email"
-          placeholder="Enter email"
-          setDataHandler={changeCredentialsHandler}
-          isValidValue={true}
-        />
-        <Input
-          id="password"
-          value={loginDto.password}
-          lableText="User password"
-          inputType="password"
-          placeholder="Enter password"
-          setDataHandler={changeCredentialsHandler}
-          isValidValue={true}
-        />
+      <Toast ref={toast} />
+      <h3 className="label">Авторизация</h3>
+      <Input
+        id="email"
+        value={loginDto.email}
+        inputType="email"
+        placeholder="Введите email"
+        setDataHandler={changeCredentialsHandler}
+        isValidValue={true}
+      />
+      <Input
+        id="password"
+        className="password-field"
+        value={loginDto.password}
+        inputType="password"
+        placeholder="Введите пароль"
+        setDataHandler={changeCredentialsHandler}
+        isValidValue={true}
+      />
+      <div className="login-button">
         <Button type="submit" onClick={handleClick}>
           Войти
         </Button>
-        {!isValidCredentials && <p>Неверные данные</p>}
-      </form>
+      </div>
     </div>
   );
 });

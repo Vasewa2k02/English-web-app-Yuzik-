@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import Input from "../components/Input";
@@ -10,8 +10,11 @@ import { Button } from "primereact/button";
 import "../styles/common.css";
 import "../styles/registration.css";
 import { Dialog } from "primereact/dialog";
+import { Card } from "primereact/card";
+import { Toast } from "primereact/toast";
 
 const Registration = observer(() => {
+  const toast = useRef(null);
   const navigate = useNavigate();
   const [isValidName, setIsValidName] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false);
@@ -21,18 +24,25 @@ const Registration = observer(() => {
     email: "",
     name: "",
   });
-  const [isValidCredentials, setIsValidCredentials] = useState(true);
+
+  const showError = (message, summary, life) => {
+    toast.current.show({
+      severity: "error",
+      summary: summary || "Ошибка",
+      detail:
+        message || "Вы ввели неверные данные или данные на странице устарели",
+      life: life || 3000,
+    });
+  };
 
   const changeEmailHandler = ({ id, value }) => {
     setRegistrationDto((prev) => ({ ...prev, [id]: value }));
     setIsValidEmail(REGEXES.EMAIL_REGEX.test(value));
-    setIsValidCredentials(true);
   };
 
   const changeNameHandler = ({ id, value }) => {
     setRegistrationDto((prev) => ({ ...prev, [id]: value }));
     setIsValidName(REGEXES.NAME_REGEX.test(value));
-    setIsValidCredentials(true);
   };
 
   const handleClick = async (e) => {
@@ -44,45 +54,49 @@ const Registration = observer(() => {
       setShowModal(true);
     } catch (err) {
       if (err.response.status === 409) {
-        setIsValidCredentials(false);
-        setIsRegisterDisabled(false);
+        showError("Такой пользователь уже существует!");
+      } else {
+        showError("Неверные данные!");
       }
+
+      setIsRegisterDisabled(false);
     }
   };
 
   return (
     <div className="all-center">
-      <form>
-        <h3 className="label">Регистрация</h3>
-        <Input
-          id="email"
-          value={registrationDto.email}
-          lableText="Email"
-          isValidValue={isValidEmail}
-          inputType="email"
-          placeholder="Enter email"
-          setDataHandler={changeEmailHandler}
-          errorMessage="Некорректный email"
-        />
-        <Input
-          id="name"
-          value={registrationDto.name}
-          lableText="Username"
-          isValidValue={isValidName}
-          inputType="text"
-          placeholder="Enter name"
-          setDataHandler={changeNameHandler}
-        />
+      <Toast ref={toast} />
+      <h3 className="label">Регистрация</h3>
+      <Input
+        className="email-field"
+        id="email"
+        value={registrationDto.email}
+        isValidValue={isValidEmail}
+        inputType="email"
+        placeholder="Введите email"
+        setDataHandler={changeEmailHandler}
+        errorMessage="Некорректный email"
+      />
+      <Input
+        id="name"
+        className="username-field"
+        value={registrationDto.name}
+        isValidValue={isValidName}
+        inputType="text"
+        placeholder="Введите имя"
+        setDataHandler={changeNameHandler}
+        errorMessage="Минимум 1 символ"
+      />
+      <div className="register-button">
         <Button
           className="btn-primary"
           label="Зарегистрироваться"
           disabled={!isValidName || !isValidEmail || isRegisterDisabled}
           onClick={handleClick}
         />
-        {!isValidCredentials && <p>Такой пользователь уже существует</p>}
-      </form>
+      </div>
       <Dialog
-        header="Ошибка"
+        header="Регистрация прошла успешно"
         visible={showModal}
         style={{ width: "50vw" }}
         onHide={() => navigate(ROUTES.LOGIN_ROUTE)}

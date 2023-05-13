@@ -30,6 +30,7 @@ import * as statisticsApi from "../api-requests/statistics-api";
 import io from "socket.io-client";
 
 const TIMER_UPDATE = 100;
+const synth = window.speechSynthesis;
 
 const LexiconProgress = observer(() => {
   const { user } = useContext(Context);
@@ -317,7 +318,7 @@ const LexiconProgress = observer(() => {
       <Toast ref={toast} />
       <div className="single-learn">
         <DataTable
-          className="card"
+          className="card single-learn__table"
           value={dictionaries}
           editMode="row"
           dataKey="id"
@@ -339,13 +340,26 @@ const LexiconProgress = observer(() => {
           <Column field="description" header="описание" sortable />
         </DataTable>
         <div className="single-learn__word-field">
+          <h5>{currentWord ? "Переведите слово" : "Выберите словарь"}</h5>
           {currentWord && (
-            <label>
-              {currentWord.mainSpelling}
-              {currentWord.description && (
-                <span> ({currentWord.description})</span>
-              )}
-            </label>
+            <div className="single-learn__word">
+              <Button
+                icon="pi pi-volume-up"
+                rounded
+                text
+                onClick={() =>
+                  synth.speak(
+                    new SpeechSynthesisUtterance(currentWord.mainSpelling)
+                  )
+                }
+              />{" "}
+              <label>
+                {currentWord.mainSpelling}
+                {currentWord.description && (
+                  <span> ({currentWord.description})</span>
+                )}
+              </label>
+            </div>
           )}
           {currentWords !== null &&
             currentWords.map((word) => (
@@ -360,6 +374,7 @@ const LexiconProgress = observer(() => {
       </div>
       <div className="socket-container">
         <div className="socket-container__fields">
+          <h5>Квиз изучение</h5>
           <Knob value={timer} strokeWidth={5} max={10} />
           <label>
             {socketWord?.englishSpelling || "*"}
@@ -370,6 +385,7 @@ const LexiconProgress = observer(() => {
           <InputText
             value={socketAnswer}
             onChange={(event) => setSocketAnswer(event.target.value)}
+            placeholder="Введите перeвод"
           ></InputText>
           <Button
             label="Ответить"

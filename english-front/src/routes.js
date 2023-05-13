@@ -27,10 +27,13 @@ export const userRoutes = [
     path: ROUTES.LEXICON_PROGRESS_ROUTE,
     Component: LexiconProgress,
   },
-  
   {
     path: ROUTES.GRAMMAR_PROGRESS_ROUTE,
     Component: LessonLearn,
+  },
+  {
+    path: ROUTES.STATISTICS_ROUTE,
+    Component: Statistics,
   },
 ];
 

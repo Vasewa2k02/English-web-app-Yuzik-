@@ -11,7 +11,18 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   width: 45%;
+}
+
+.single-learn__table {
+  width: 45%;
+}
+
+.single-learn__word {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .single-learn__word-field {
@@ -19,7 +30,8 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  width: 35%;
+  width: 45%;
+  height: 500px;
   border: 1px solid #dee2e6;
   border-radius: 5px;
 }
@@ -28,7 +40,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: 45%;
+  width: 40%;
 }
 
 .socket-container__fields {
@@ -36,7 +48,7 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  width: 50%;
+  width: 45%;
   height: 350px;
   padding: 20px;
   border: 1px solid #dee2e6;
@@ -44,9 +56,10 @@
 }
 
 .socket-container__button {
-  width: 100%;
+  width: 208px;
+  margin-top: 10px;
 }
 
 .socket-container__leaderboard {
-  width: 40%;
+  width: 45%;
 }

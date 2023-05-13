@@ -10,7 +10,7 @@ const Input = (props) => {
   };
 
   return (
-    <div className="input-container">
+    <div className={`input-container ${props?.className}`}>
       <label className="default-lable">{props.lableText}</label>
       <InputText
         id={props.id}
