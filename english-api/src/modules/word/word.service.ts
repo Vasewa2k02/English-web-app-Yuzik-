@@ -9,6 +9,7 @@ import { DictionaryService } from '../dictionary/dictionary.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
+import { WordForSocketResponse } from './response/word-for-socket.response';
 import { WordResponse } from './response/word.response';
 import { WordRepository } from './word.repository';
 
@@ -100,5 +101,9 @@ export class WordService {
     }
 
     await this.wordRepository.removeWordFromDictionary(wordId, dictionaryId);
+  }
+
+  public async getRandomWord(): Promise<WordForSocketResponse> {
+    return await this.wordRepository.getRandomWord();
   }
 }

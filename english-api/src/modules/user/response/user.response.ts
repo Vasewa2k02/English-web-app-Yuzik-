@@ -5,13 +5,16 @@ import { UserSettingsResponse } from 'src/modules/user-settings/response/user-se
 import { UserRoleResponse } from './user-role.response';
 
 export class UserResponse
-  implements Pick<User, 'id' | 'email' | 'roleId' | 'idEnableLesson'>
+  implements Pick<User, 'id' | 'email' | 'name' | 'roleId' | 'idEnableLesson'>
 {
   @ApiProperty()
   id: number;
 
   @ApiProperty()
   email: string;
+
+  @ApiProperty()
+  name: string;
 
   @ApiProperty()
   roleId: number;

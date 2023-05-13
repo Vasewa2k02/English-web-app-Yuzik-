@@ -126,7 +126,7 @@ model Statistics {
   date       DateTime
   words      Int?
   tasks      Int?
-  quizPoints Int?     @map("quiz_points")
+  quizPoints Float?   @map("quiz_points")
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

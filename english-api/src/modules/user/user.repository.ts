@@ -18,6 +18,7 @@ export class UserRepository {
 
   private fullUserSelect = {
     id: true,
+    name: true,
     email: true,
     roleId: true,
     idEnableLesson: true,

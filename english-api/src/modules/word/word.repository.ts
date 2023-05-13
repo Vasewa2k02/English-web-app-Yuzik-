@@ -4,6 +4,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
+import { WordForSocketResponse } from './response/word-for-socket.response';
 import { WordResponse } from './response/word.response';
 
 @Injectable()
@@ -24,6 +25,13 @@ export class WordRepository {
         creatorId: true,
       },
     },
+  };
+
+  private wordForSocketSelect = {
+    id: true,
+    englishSpelling: true,
+    russianSpelling: true,
+    description: true,
   };
 
   public async createWord(
@@ -78,6 +86,14 @@ export class WordRepository {
       },
       select: this.fullWordSelect,
     });
+  }
+
+  public async getRandomWord(): Promise<WordForSocketResponse> {
+    const words = await this.db.word.findMany({
+      select: this.wordForSocketSelect,
+    });
+
+    return words.sort(() => Math.random() - 0.5)[0];
   }
 
   public async updateWord(

@@ -46,7 +46,7 @@ const Dictionary = observer(() => {
       const _dictionaries = await dictionaryApi.getDictionariesReview();
       _dictionaries.map((dictionary) => {
         dictionary.words.map((word) => {
-          word.progressCount = word.lexiconProgress[0]?.progressCount | 0;
+          word.progressCount = word.lexiconProgress[0]?.progressCount || 0;
           word.isLearned = word.lexiconProgress[0]?.isLearned ? "да" : "нет";
         });
       });

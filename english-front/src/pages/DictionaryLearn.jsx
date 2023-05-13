@@ -4,6 +4,7 @@ import { Column } from "primereact/column";
 import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
+import { Knob } from "primereact/knob";
 
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -15,35 +16,37 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 import { observer } from "mobx-react-lite";
-import { updateWord } from "../api-requests/word-api";
-import Input from "../components/Input";
-import { REGEXES } from "../utils/regexes";
 
 import * as dictionaryApi from "../api-requests/dictionary-api";
 import * as wordApi from "../api-requests/word-api";
 import { Toast } from "primereact/toast";
 import { Context } from "..";
-import { ROLES } from "../utils/roles";
 import { LearningMode, NUMBER_OF_WORD_CHOICES } from "../utils/learn-settings";
 
 import "../styles/dictionary-learn-page.css";
 import * as lexiconProgressApi from "../api-requests/lexicon-progress-api";
 import * as statisticsApi from "../api-requests/statistics-api";
 
-import { Subject } from "rxjs";
-import { webSocket } from "rxjs/webSocket";
-
 import io from "socket.io-client";
 
-const SOCKET_URL = "https://localhost:5001/api";
+const TIMER_UPDATE = 100;
 
 const LexiconProgress = observer(() => {
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const { user } = useContext(Context);
+  const { userSettings } = useContext(Context);
+  const toast = useRef(null);
+
   const [socket, setSocket] = useState(null);
+  const [socketWord, setSocketWord] = useState(null);
+  const [socketAnswer, setSocketAnswer] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [quizStatistics, setQuizStatistics] = useState(null);
+  const [isQuizButtonDisabled, setIsQuizButtonDisabled] = useState(true);
 
   useEffect(() => {
-    const newSocket = io(SOCKET_URL, { transports: ["websocket"] });
+    const newSocket = io(process.env.REACT_APP_WS_URL, {
+      transports: ["websocket"],
+    });
 
     setSocket(newSocket);
 
@@ -55,18 +58,55 @@ const LexiconProgress = observer(() => {
       return;
     }
 
-    socket.on("message", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+    socket.on("newRound", (word) => {
+      setSocketWord(word.word);
+      setIsQuizButtonDisabled(false);
+      setQuizStatistics(null);
+
+      let _timer = ((word.timeOut - new Date().getTime()) / 1000).toFixed(1);
+
+      const intervalId = setInterval(() => {
+        _timer -= 0.1;
+        setTimer(_timer.toFixed(1));
+      }, TIMER_UPDATE);
+
+      setTimeout(() => {
+        clearInterval(intervalId);
+      }, _timer * 1000);
+    });
+
+    socket.on("renewLeaderboards", (message) => {
+      setQuizStatistics(message);
     });
   }, [socket]);
 
-  const sendMessage = () => {
-    socket.emit("message", inputValue);
-    setInputValue("");
-  };
+  const sendMessage = async () => {
+    setIsQuizButtonDisabled(true);
 
-  const { userSettings } = useContext(Context);
-  const toast = useRef(null);
+    if (
+      socketWord.russianSpelling.toUpperCase() === socketAnswer.toUpperCase()
+    ) {
+      const quizPoints = Number(timer);
+
+      await statisticsApi.createOrUpdateStatistics({ quizPoints });
+      socket.emit("correctAnswer", {
+        name: user.getUser().name,
+        quizPoints,
+      });
+      showSuccess(
+        `Вы получили ${quizPoints} очков!`,
+        "Правильный ответ!",
+        2000
+      );
+    } else {
+      showError(
+        `Правильно: ${socketWord.englishSpelling} - ${socketWord.russianSpelling}`,
+        "Ответ не верный :("
+      );
+    }
+
+    setSocketAnswer("");
+  };
 
   const showSuccess = (message, summary, life) => {
     toast.current.show({
@@ -108,9 +148,9 @@ const LexiconProgress = observer(() => {
       const _dictionaries = await dictionaryApi.getDictionariesLearn();
       _dictionaries.map((dictionary) => {
         dictionary.words.map((word) => {
-          word.lexiconProgressId = word.lexiconProgress[0]?.id | undefined;
-          word.progressCount = word.lexiconProgress[0]?.progressCount | 0;
-          word.isLearned = word.lexiconProgress[0]?.isLearned | false;
+          word.lexiconProgressId = word.lexiconProgress[0]?.id || undefined;
+          word.progressCount = word.lexiconProgress[0]?.progressCount || 0;
+          word.isLearned = word.lexiconProgress[0]?.isLearned || false;
         });
       });
 
@@ -252,6 +292,7 @@ const LexiconProgress = observer(() => {
   };
 
   const selectDictionary = (e) => {
+    console.log(timer);
     setSelectedDictionary(e.value);
     setWords(dictionaries.find((item) => item.id === e.value.id).words);
   };
@@ -317,17 +358,41 @@ const LexiconProgress = observer(() => {
             ))}
         </div>
       </div>
-      <div>
-        <ul>
-          {messages.map((message, index) => (
-            <li key={index}>{message}</li>
-          ))}
-        </ul>
-        <input
-          value={inputValue}
-          onChange={(event) => setInputValue(event.target.value)}
-        />
-        <button onClick={sendMessage}>Send</button>
+      <div className="socket-container">
+        <div className="socket-container__fields">
+          <Knob value={timer} strokeWidth={5} max={10} />
+          <label>
+            {socketWord?.englishSpelling || "*"}
+            {socketWord?.description && (
+              <span> ({socketWord.description})</span>
+            )}
+          </label>
+          <InputText
+            value={socketAnswer}
+            onChange={(event) => setSocketAnswer(event.target.value)}
+          ></InputText>
+          <Button
+            label="Ответить"
+            className="socket-container__button"
+            disabled={isQuizButtonDisabled}
+            onClick={sendMessage}
+          ></Button>
+        </div>
+        <DataTable
+          className="card socket-container__leaderboard"
+          value={quizStatistics}
+          editMode="row"
+          dataKey="name"
+          sortOrder={1}
+          paginator
+          rows={5}
+          rowsPerPageOptions={[5, 10, 20, 50]}
+          paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
+          currentPageReportTemplate="{first} to {last} of {totalRecords}"
+        >
+          <Column field="name" header="имя" sortable />
+          <Column field="quizPoints" header="очков" sortable />
+        </DataTable>
       </div>
     </div>
   );
