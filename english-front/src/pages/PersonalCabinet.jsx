@@ -169,7 +169,7 @@ const PersonalCabinet = observer(() => {
           <label className="learning-settings__label">
             Количество правильных ответов, следующих подряд, после которого
             слово считается выученным и исключается из списка, но остаётся в
-            словаре. Вы можете обнулить результаты и учить слова заново
+            словаре
           </label>
           <Slider
             className="learning-settings__input"

@@ -36,6 +36,7 @@ export const getCurrentUser = async () => {
         const { accessToken } = await $authHost.post(ROUTES.REFREASH_ROUTE);
         localStorage.setItem("token", accessToken);
         const { data } = await $authHost.get(ROUTES.AUTH_ROUTE);
+        console.log(data);
         return data.user;
       } catch (err) {}
     } else {

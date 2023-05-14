@@ -22,6 +22,19 @@ export class TaskRepository {
     });
   }
 
+  public async getUniqueTask(
+    createTaskDto: CreateTaskDto,
+  ): Promise<TaskResponse> {
+    return await this.db.task.findUnique({
+      where: {
+        englishSentence_russianSentence_lessonId: {
+          ...createTaskDto,
+        },
+      },
+      select: this.selectForLesson,
+    });
+  }
+
   public async createTask(createTaskDto: CreateTaskDto): Promise<TaskResponse> {
     const { lessonId, ...dto } = createTaskDto;
     return await this.db.task.create({

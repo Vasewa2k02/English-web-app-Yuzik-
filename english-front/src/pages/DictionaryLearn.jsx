@@ -28,6 +28,8 @@ import * as lexiconProgressApi from "../api-requests/lexicon-progress-api";
 import * as statisticsApi from "../api-requests/statistics-api";
 
 import io from "socket.io-client";
+import { NOT_FOUND } from "../utils/statuses";
+import { INVALID_INPUT, OLD_DATA } from "../utils/error-messages";
 
 const TIMER_UPDATE = 100;
 const synth = window.speechSynthesis;
@@ -84,26 +86,35 @@ const LexiconProgress = observer(() => {
   const sendMessage = async () => {
     setIsQuizButtonDisabled(true);
 
-    if (
-      socketWord.russianSpelling.toUpperCase() === socketAnswer.toUpperCase()
-    ) {
-      const quizPoints = Number(timer);
+    try {
+      if (
+        socketWord.russianSpelling.toUpperCase() === socketAnswer.toUpperCase()
+      ) {
+        const quizPoints = Number(timer);
 
-      await statisticsApi.createOrUpdateStatistics({ quizPoints });
-      socket.emit("correctAnswer", {
-        name: user.getUser().name,
-        quizPoints,
-      });
-      showSuccess(
-        `Вы получили ${quizPoints} очков!`,
-        "Правильный ответ!",
-        2000
-      );
-    } else {
-      showError(
-        `Правильно: ${socketWord.englishSpelling} - ${socketWord.russianSpelling}`,
-        "Ответ не верный :("
-      );
+        await statisticsApi.createOrUpdateStatistics({ quizPoints });
+        socket.emit("correctAnswer", {
+          name: user.getUser().name,
+          quizPoints,
+        });
+        showSuccess(
+          `Вы получили ${quizPoints} очков!`,
+          "Правильный ответ!",
+          2000
+        );
+      } else {
+        showError(
+          `Правильно: ${socketWord.englishSpelling} - ${socketWord.russianSpelling}`,
+          "Ответ не верный :("
+        );
+      }
+    } catch (error) {
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
 
     setSocketAnswer("");
@@ -267,7 +278,14 @@ const LexiconProgress = observer(() => {
       } else {
         changeCurrentWords();
       }
-    } catch (error) {}
+    } catch (error) {
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
+    }
   };
 
   const initFilters = () => {
@@ -277,9 +295,10 @@ const LexiconProgress = observer(() => {
     setDictionaryFilterValue("");
   };
 
-  const renderHeader = (filterValue, filterChange) => {
+  const renderHeader = (filterValue, filterChange, tableName) => {
     return (
-      <div className="flex justify-content-between">
+      <div className="table-header">
+        <span className="text-xl text-900 font-bold">{tableName}</span>
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -310,7 +329,12 @@ const LexiconProgress = observer(() => {
 
   const dictionaryHeader = renderHeader(
     dictionaryFilterValue,
-    dictionaryFilterChange
+    dictionaryFilterChange,
+    "Словари"
+  );
+
+  const leaderboardHeader = (
+    <span className="text-xl text-900 font-bold">Таблица лидеров</span>
   );
 
   return (
@@ -352,13 +376,13 @@ const LexiconProgress = observer(() => {
                     new SpeechSynthesisUtterance(currentWord.mainSpelling)
                   )
                 }
-              />{" "}
-              <label>
+              />
+              <h6>
                 {currentWord.mainSpelling}
                 {currentWord.description && (
                   <span> ({currentWord.description})</span>
                 )}
-              </label>
+              </h6>
             </div>
           )}
           {currentWords !== null &&
@@ -396,6 +420,7 @@ const LexiconProgress = observer(() => {
         </div>
         <DataTable
           className="card socket-container__leaderboard"
+          header={leaderboardHeader}
           value={quizStatistics}
           editMode="row"
           dataKey="name"

@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Dictionary, Word } from '@prisma/client';
 import { DictionaryService } from '../dictionary/dictionary.service';
@@ -52,7 +53,7 @@ export class WordService {
     const wordById = await this.wordRepository.getWordById(wordId);
 
     if (!wordById) {
-      throw new HttpException('Word not found', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Word not found');
     }
 
     const word = await this.wordRepository.getWord(
@@ -68,9 +69,8 @@ export class WordService {
       userRoleId === 1 &&
       (await this.wordRepository.isAdminDictionaryWord(wordId))
     ) {
-      throw new HttpException(
+      throw new BadRequestException(
         'You can`t update word from admin dictionary',
-        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -85,7 +85,7 @@ export class WordService {
     const word: WordResponse = await this.wordRepository.getWordById(wordId);
 
     if (!word) {
-      throw new HttpException('Word not found', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Word not found');
     }
 
     if (
@@ -94,10 +94,7 @@ export class WordService {
           dictionary.creatorId === userId && dictionary.id === dictionaryId,
       )
     ) {
-      throw new HttpException(
-        'Impossible remove this word from this dictionary',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new NotFoundException('This word doesn`t exist in this dictionary');
     }
 
     await this.wordRepository.removeWordFromDictionary(wordId, dictionaryId);

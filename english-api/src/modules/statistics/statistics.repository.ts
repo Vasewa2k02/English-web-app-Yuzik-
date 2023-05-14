@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from 'src/database/database.service';
 import { CreateStatisticDto } from './dto/create-statistic.dto';
+import { StatisticsResponse } from './response/statistics.response';
 
 @Injectable()
 export class StatisticsRepository {
@@ -12,6 +13,12 @@ export class StatisticsRepository {
     progressCount: true,
     isLearned: true,
     wordId: true,
+  };
+
+  private statisticsSelect = {
+    words: true,
+    tasks: true,
+    quizPoints: true,
   };
 
   public async createOrUpdateStatistics(
@@ -53,53 +60,34 @@ export class StatisticsRepository {
     });
   }
 
-  // public async getLexiconProgress(
-  //   userId: number,
-  //   wordId: number,
-  // ): Promise<LexiconProgressResponse> {
-  //   return await this.db.lexiconProgress.findUnique({
-  //     where: {
-  //       userId_wordId: {
-  //         userId: userId,
-  //         wordId: wordId,
-  //       },
-  //     },
-  //     select: this.lexiconProgressSelect,
-  //   });
-  // }
+  public async getAllStatistics(): Promise<any> {
+    return await this.db
+      .$queryRaw`SELECT users.id, name, cast(sum(words) as integer) words,
+      cast(sum(tasks) as integer) tasks, cast(sum(quiz_points) as integer) quizPoints
+      FROM public.statistics JOIN public.users on statistics.user_id = users.id
+      GROUP by statistics.user_id, users.id, name`;
+  }
 
-  // public async createOrUpdateLexiconProgress(
-  //   userId: number,
-  //   wordId: number,
-  //   progressCount: number,
-  //   isLearned: boolean,
-  // ): Promise<LexiconProgressResponse> {
-  //   return await this.db.lexiconProgress.upsert({
-  //     where: {
-  //       userId_wordId: {
-  //         userId: userId,
-  //         wordId: wordId,
-  //       },
-  //     },
-  //     create: {
-  //       progressCount,
-  //       isLearned,
-  //       user: {
-  //         connect: {
-  //           id: userId,
-  //         },
-  //       },
-  //       word: {
-  //         connect: {
-  //           id: wordId,
-  //         },
-  //       },
-  //     },
-  //     update: {
-  //       progressCount,
-  //       isLearned,
-  //     },
-  //     select: this.lexiconProgressSelect,
-  //   });
-  // }
+  public async getUserAllStatistics(userId: number): Promise<any> {
+    return await this.db
+      .$queryRaw`SELECT users.id, name, cast(sum(words) as integer) words,
+    cast(sum(tasks) as integer) tasks, cast(sum(quiz_points) as integer) quizPoints
+    FROM public.statistics JOIN public.users on statistics.user_id = users.id
+    WHERE statistics.user_id = ${userId}
+    GROUP by statistics.user_id, users.id, name`;
+  }
+
+  public async getUserTodayStatistics(userId: number): Promise<any> {
+    const todayISO = new Date().toISOString().substring(0, 10);
+
+    return await this.db.statistics.findUnique({
+      where: {
+        date_userId: {
+          date: new Date(todayISO),
+          userId,
+        },
+      },
+      select: this.statisticsSelect,
+    });
+  }
 }

@@ -32,6 +32,7 @@ import { REGEXES } from "../utils/regexes";
 
 import * as statisticsApi from "../api-requests/statistics-api";
 import * as grammarProgressApi from "../api-requests/grammar-progress-api";
+import { INVALID_INPUT, OLD_DATA } from "../utils/error-messages";
 
 const LessonLearn = observer(() => {
   const { userSettings } = useContext(Context);
@@ -81,29 +82,32 @@ const LessonLearn = observer(() => {
 
     const _tasks = [...tasks];
 
-    if (_tasks.length === 0) {
-      const _lessons = await lessonApi.getStudyLessons();
+    try {
+      if (_tasks.length === 0) {
+        const _lessons = await lessonApi.getStudyLessons();
 
-      if (_lessons.length > lessons.length) {
-        setLessons(_lessons);
+        if (_lessons.length > lessons.length) {
+          setLessons(_lessons);
 
-        showSuccess(
-          "Задания в уроке закончились. Выберите другой урок!",
-          "Завершёно",
-          5000
-        );
-      } else {
-        showError(
-          "Вы не достаточно изучили тему. Попробуйте почитать теорию и пройти урок ещё раз!",
-          "Неудача :(",
-          5000
-        );
+          showSuccess(
+            "Задания в уроке закончились. Выберите другой урок!",
+            "Завершёно",
+            3000
+          );
+        }
+
+        setCurrentTask(null);
+        setSelectedLesson(null);
+
+        return;
       }
-
-      setCurrentTask(null);
-      setSelectedLesson(null);
-
-      return;
+    } catch (error) {
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
 
     let _currentTask = _tasks.shift();
@@ -178,15 +182,16 @@ const LessonLearn = observer(() => {
     setLessonFilterValue("");
   };
 
-  const renderHeader = (filterValue, filterChange) => {
+  const renderHeader = (filterValue, filterChange, tableName) => {
     return (
-      <div className="flex justify-content-between">
+      <div className="table-header">
+        <span className="text-xl text-900 font-bold">{tableName}</span>
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
             value={filterValue}
             onChange={filterChange}
-            placeholder="Keytask Search"
+            placeholder="Keyword Search"
           />
         </span>
       </div>
@@ -212,30 +217,43 @@ const LessonLearn = observer(() => {
     setLessonFilterValue(value);
   };
 
-  const lessonHeader = renderHeader(lessonFilterValue, lessonFilterChange);
+  const lessonHeader = renderHeader(
+    lessonFilterValue,
+    lessonFilterChange,
+    "Уроки"
+  );
 
   const checkAnswer = async (finishedAnswer) => {
-    if (
-      currentTask.translateSentence
-        .split(REGEXES.PUNCTUATION_MARKS)
-        .filter(Boolean)
-        .join()
-        .toUpperCase() === finishedAnswer
-    ) {
-      await statisticsApi.createOrUpdateStatistics({ tasks: 1 });
-      await grammarProgressApi.createGrammarProgress({
-        taskId: currentTask.id,
-      });
-    } else {
-      showError(
-        `Правильно: ${currentTask.mainSentence} - ${currentTask.translateSentence}`,
-        "Ответ не верный :("
-      );
-    }
+    try {
+      if (
+        currentTask.translateSentence
+          .split(REGEXES.PUNCTUATION_MARKS)
+          .filter(Boolean)
+          .join()
+          .toUpperCase() === finishedAnswer
+      ) {
+        await statisticsApi.createOrUpdateStatistics({ tasks: 1 });
+        await grammarProgressApi.createGrammarProgress({
+          taskId: currentTask.id,
+        });
+      } else {
+        showError(
+          `Правильно: ${currentTask.mainSentence} - ${currentTask.translateSentence}`,
+          "Ответ не верный :("
+        );
+      }
 
-    const _tasks = [...tasks];
-    _tasks.shift();
-    setTasks(_tasks);
+      const _tasks = [...tasks];
+      _tasks.shift();
+      setTasks(_tasks);
+    } catch (error) {
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
+    }
   };
 
   const answerSentenceHandler = (wordIndex) => {

@@ -27,6 +27,8 @@ import { validateDto } from "../utils/helpers";
 import { Toast } from "primereact/toast";
 import { Context } from "..";
 import { ROLES } from "../utils/roles";
+import { NOT_FOUND } from "../utils/statuses";
+import { INVALID_INPUT, OLD_DATA } from "../utils/error-messages";
 
 const Dictionary = observer(() => {
   const { user } = useContext(Context);
@@ -92,9 +94,10 @@ const Dictionary = observer(() => {
     setDictionaryFilterValue("");
   };
 
-  const renderHeader = (filterValue, filterChange) => {
+  const renderHeader = (filterValue, filterChange, tableName) => {
     return (
-      <div className="flex justify-content-between">
+      <div className="table-header">
+        <span className="text-xl text-900 font-bold">{tableName}</span>
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -162,8 +165,12 @@ const Dictionary = observer(() => {
         description: "",
       });
     } catch (error) {
-      showError();
-      await loadData();
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
   };
 
@@ -184,8 +191,12 @@ const Dictionary = observer(() => {
       _dictionaries[index] = newData;
       setDictionaries(_dictionaries);
     } catch (error) {
-      showError();
-      await loadData();
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
   };
 
@@ -205,8 +216,12 @@ const Dictionary = observer(() => {
       setSelectedDictionary(null);
       setWords(null);
     } catch (error) {
-      showError();
-      await loadData();
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
   };
 
@@ -222,7 +237,8 @@ const Dictionary = observer(() => {
 
   const dictionaryHeader = renderHeader(
     dictionaryFilterValue,
-    dictionaryFilterChange
+    dictionaryFilterChange,
+    "Словари"
   );
 
   const [wordDto, setWordDto] = useState({
@@ -287,8 +303,12 @@ const Dictionary = observer(() => {
         description: "",
       });
     } catch (error) {
-      showError();
-      await loadData();
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
   };
 
@@ -314,8 +334,12 @@ const Dictionary = observer(() => {
       setDictionaries(_dictionaries);
       setWords(_dictionaries[_dictionaryIndex].words);
     } catch (error) {
-      showError();
-      await loadData();
+      if (error?.response?.status === NOT_FOUND) {
+        await loadData();
+        showError(OLD_DATA);
+      } else {
+        showError(INVALID_INPUT);
+      }
     }
   };
 
@@ -352,7 +376,7 @@ const Dictionary = observer(() => {
     setWordFilterValue(value);
   };
 
-  const wordHeader = renderHeader(wordFilterValue, wordFilterChange);
+  const wordHeader = renderHeader(wordFilterValue, wordFilterChange, "Слова");
 
   return (
     <div className="dictionary-container">

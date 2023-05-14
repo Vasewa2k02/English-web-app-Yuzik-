@@ -3,6 +3,14 @@
   margin-bottom: 40px;
 }
 
+.lesson-container__lesson-table {
+  max-width: 40%;
+}
+
+.lesson-container__task-table {
+  max-width: 60%;
+}
+
 .input-area {
   display: flex;
   flex-direction: row;

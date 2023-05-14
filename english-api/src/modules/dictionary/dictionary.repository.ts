@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
-import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
 
 @Injectable()

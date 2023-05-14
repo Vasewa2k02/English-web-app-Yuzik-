@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGrammarProgressDto } from './dto/create-grammar-progress.dto';
-import { UpdateGrammarProgressDto } from './dto/update-grammar-progress.dto';
+
 import { GrammarProgressRepository } from './grammar-progress.repository';
 
 @Injectable()

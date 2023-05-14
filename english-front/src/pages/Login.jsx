@@ -56,7 +56,6 @@ const Login = observer(() => {
       }
       navigate(ROUTES.DICTIONARY_ROUTE);
     } catch (err) {
-      console.log(err);
       showError("Неверные данные");
     }
   };

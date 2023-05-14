@@ -100,15 +100,16 @@ const Lesson = observer(() => {
     setLessonFilterValue("");
   };
 
-  const renderHeader = (filterValue, filterChange) => {
+  const renderHeader = (filterValue, filterChange, tableName) => {
     return (
-      <div className="flex justify-content-between">
+      <div className="table-header">
+        <span className="text-xl text-900 font-bold">{tableName}</span>
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
             value={filterValue}
             onChange={filterChange}
-            placeholder="Keytask Search"
+            placeholder="Keyword Search"
           />
         </span>
       </div>
@@ -139,7 +140,7 @@ const Lesson = observer(() => {
 
   const lessonRegexes = {
     name: REGEXES.LESSON_NAME_REGEX,
-    theory: REGEXES.LESSON_THEORY_REGEX,
+    //theory: REGEXES.LESSON_THEORY_REGEX,
   };
 
   const selectLesson = (e) => {
@@ -186,7 +187,7 @@ const Lesson = observer(() => {
         passingPercent: 50,
       });
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -242,7 +243,7 @@ const Lesson = observer(() => {
       setSelectedLesson(null);
       setTasks(null);
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -261,7 +262,11 @@ const Lesson = observer(() => {
     setLessonFilterValue(value);
   };
 
-  const lessonHeader = renderHeader(lessonFilterValue, lessonFilterChange);
+  const lessonHeader = renderHeader(
+    lessonFilterValue,
+    lessonFilterChange,
+    "Уроки"
+  );
 
   const [taskDto, setTaskDto] = useState({
     id: "",
@@ -328,7 +333,7 @@ const Lesson = observer(() => {
         lessonId: selectedLesson.id,
       });
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -367,7 +372,7 @@ const Lesson = observer(() => {
 
       showSuccess("Задание изменено.");
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -396,7 +401,7 @@ const Lesson = observer(() => {
       setTasks(_lessons[_lessonIndex].tasks);
       setSelectedTask(null);
     } catch (error) {
-      if (error.response.status === NOT_FOUND) {
+      if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);
       } else {
@@ -415,14 +420,14 @@ const Lesson = observer(() => {
     setTaskFilterValue(value);
   };
 
-  const taskHeader = renderHeader(taskFilterValue, taskFilterChange);
+  const taskHeader = renderHeader(taskFilterValue, taskFilterChange, "Задания");
 
   return (
     <div className="lesson-container">
       <Toast ref={toast} />
       <div className="tables">
         <DataTable
-          className="card"
+          className="card lesson-container__lesson-table"
           value={lessons}
           editMode="row"
           dataKey="id"
@@ -458,7 +463,7 @@ const Lesson = observer(() => {
           <Column body={actionLessonBodyTemplate} />
         </DataTable>
         <DataTable
-          className="card"
+          className="card lesson-container__task-table"
           value={tasks}
           editMode="row"
           dataKey="id"

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { LexiconProgress } from '@prisma/client';
+
 import RequestWithUser from '../auth/interface/request-with-user.interface';
-import { CreateStatisticDto } from '../statistics/dto/create-statistic.dto';
 import { StatisticsService } from '../statistics/statistics.service';
 import { CreateLexiconProgressDto } from './dto/create-lexicon-progress.dto';
 import { LexiconProgressRepository } from './lexicon-progress.repository';

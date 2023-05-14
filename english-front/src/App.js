@@ -16,6 +16,7 @@ const App = observer(() => {
   useEffect(() => {
     getCurrentUser()
       .then((data) => {
+        console.log(data);
         user.setUser(data);
         user.setRoleId(data.roleId);
 

@@ -58,10 +58,6 @@ export const publicRoutes = [
     Component: Registration,
   },
   {
-    path: ROUTES.STATISTICS_ROUTE,
-    Component: Statistics,
-  },
-  {
     path: "*",
     Component: NotFound,
   },

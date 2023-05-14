@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { CreateStatisticDto } from './dto/create-statistic.dto';
+import { StatisticsResponse } from './response/statistics.response';
 
 @ApiTags('statistics')
 @Controller('statistics')
@@ -31,5 +32,30 @@ export class StatisticsController {
       +req.user.id,
       createStatisticDto,
     );
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('all')
+  getAllStatistics(): Promise<StatisticsResponse[]> {
+    return this.statisticsService.getAllStatistics();
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('user-all')
+  getUserAllStatistics(
+    @Req() req: RequestWithUser,
+  ): Promise<StatisticsResponse> {
+    return this.statisticsService.getUserAllStatistics(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('user-today')
+  getUserTodayStatistics(
+    @Req() req: RequestWithUser,
+  ): Promise<StatisticsResponse> {
+    return this.statisticsService.getUserTodayStatistics(+req.user.id);
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskResponse } from './response/task.response';
@@ -9,6 +13,12 @@ export class TaskService {
   constructor(private readonly taskRepository: TaskRepository) {}
 
   async createTask(createTaskDto: CreateTaskDto): Promise<TaskResponse> {
+    const task = await this.taskRepository.getUniqueTask(createTaskDto);
+
+    if (task) {
+      throw new BadRequestException('This task already exists');
+    }
+
     return await this.taskRepository.createTask(createTaskDto);
   }
 

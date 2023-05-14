@@ -197,4 +197,9 @@ export const permissions = [
     descriptor: 'GrammarProgressController',
     roleId: 1,
   },
+  {
+    method: Method.GET,
+    descriptor: 'StatisticsController',
+    roleId: 1,
+  },
 ];

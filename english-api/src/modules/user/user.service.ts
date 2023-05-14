@@ -66,8 +66,6 @@ export class UserService {
     user: UserResponse,
     updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<void> {
-    console.log(await this.userRepository.getHashedUserPassword(user.id));
-
     if (
       !(await bcrypt.compare(
         updateUserPasswordDto.oldPassword,

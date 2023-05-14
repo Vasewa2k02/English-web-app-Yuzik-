@@ -1,5 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Dictionary } from '@prisma/client';
+import { NotFoundError } from 'rxjs';
 import { DictionaryRepository } from './dictionary.repository';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
@@ -79,14 +86,11 @@ export class DictionaryService {
       await this.dictionaryRepository.getDictionaryById(dictionaryId);
 
     if (!dictionary) {
-      throw new HttpException('Dictionary not found', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('Dictionary not found');
     }
 
     if (dictionary.creatorId !== userId) {
-      throw new HttpException(
-        'Not owner try to update dictionary',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('Not owner try to update dictionary');
     }
   }
 }

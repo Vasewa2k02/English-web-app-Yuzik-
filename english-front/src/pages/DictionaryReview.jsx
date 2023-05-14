@@ -67,9 +67,10 @@ const Dictionary = observer(() => {
     setDictionaryFilterValue("");
   };
 
-  const renderHeader = (filterValue, filterChange) => {
+  const renderHeader = (filterValue, filterChange, tableName) => {
     return (
-      <div className="flex justify-content-between">
+      <div className="table-header">
+        <span className="text-xl text-900 font-bold">{tableName}</span>
         <span className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
@@ -109,7 +110,8 @@ const Dictionary = observer(() => {
 
   const dictionaryHeader = renderHeader(
     dictionaryFilterValue,
-    dictionaryFilterChange
+    dictionaryFilterChange,
+    "Словари"
   );
 
   const wordFilterChange = (e) => {
@@ -122,7 +124,7 @@ const Dictionary = observer(() => {
     setWordFilterValue(value);
   };
 
-  const wordHeader = renderHeader(wordFilterValue, wordFilterChange);
+  const wordHeader = renderHeader(wordFilterValue, wordFilterChange, "Слова");
 
   return (
     <div className="dictionary-container">

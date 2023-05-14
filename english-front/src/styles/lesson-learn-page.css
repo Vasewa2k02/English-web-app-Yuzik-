@@ -25,15 +25,15 @@
 
 .lesson-learn__answer-finished {
   min-height: 50px;
-  margin-top: 10px;
+  margin-top: 20px;
   margin-bottom: 10px;
 }
 
 .lesson-learn__answer {
   min-height: 50px;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .answer-word {
-  margin: 0 5px;
+  margin: 5px;
 }

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateStatisticDto } from './dto/create-statistic.dto';
+import { StatisticsResponse } from './response/statistics.response';
 import { StatisticsRepository } from './statistics.repository';
 
 @Injectable()
@@ -14,5 +15,17 @@ export class StatisticsService {
       userId,
       createStatisticDto,
     );
+  }
+
+  async getAllStatistics(): Promise<StatisticsResponse[]> {
+    return await this.statisticsRepository.getAllStatistics();
+  }
+
+  async getUserAllStatistics(userId: number): Promise<StatisticsResponse> {
+    return await this.statisticsRepository.getUserAllStatistics(userId);
+  }
+
+  async getUserTodayStatistics(userId: number): Promise<StatisticsResponse> {
+    return await this.statisticsRepository.getUserTodayStatistics(userId);
   }
 }

@@ -12,11 +12,11 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  width: 45%;
+  width: 50%;
 }
 
 .single-learn__table {
-  width: 45%;
+  width: 50%;
 }
 
 .single-learn__word {

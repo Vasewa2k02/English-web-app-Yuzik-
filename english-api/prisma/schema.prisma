@@ -57,6 +57,7 @@ model Task {
   lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   grammarProgress GrammarProgress[]
 
+  @@unique([englishSentence, russianSentence, lessonId])
   @@map("tasks")
 }
 
