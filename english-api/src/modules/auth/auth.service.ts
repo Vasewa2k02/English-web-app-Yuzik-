@@ -102,6 +102,7 @@ export class AuthService {
     });
     const refreshTokenCookie = cookie.serialize('refreshToken', token, {
       httpOnly: true,
+      secure: true,
       path: '/',
       maxAge: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
     });
@@ -115,8 +116,10 @@ export class AuthService {
     refreshToken: string,
     userId: number,
   ): Promise<UserResponse> {
+    console.log(await this.sessionService.getRefreshToken(userId));
+
     if (refreshToken !== (await this.sessionService.getRefreshToken(userId))) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      throw new HttpException('XUIXUXI', HttpStatus.FORBIDDEN);
     }
 
     return await this.userService.getUserById(userId);

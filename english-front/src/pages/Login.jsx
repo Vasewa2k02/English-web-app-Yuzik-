@@ -53,8 +53,10 @@ const Login = observer(() => {
       if (user.getRoleId() === ROLES.USER) {
         const _userSettings = await getUserSettings();
         userSettings.setUserSettings(_userSettings);
+        navigate(ROUTES.STATISTICS_ROUTE);
+      } else {
+        navigate(ROUTES.DICTIONARY_ROUTE);
       }
-      navigate(ROUTES.DICTIONARY_ROUTE);
     } catch (err) {
       showError("Неверные данные");
     }

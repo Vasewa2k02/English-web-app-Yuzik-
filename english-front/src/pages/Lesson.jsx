@@ -181,12 +181,13 @@ const Lesson = observer(() => {
       setLessons(lessons);
 
       setLessonDto({
-        id: selectedLesson.id,
+        id: selectedLesson?.id,
         name: "",
         theory: "",
         passingPercent: 50,
       });
     } catch (error) {
+      console.log(error);
       if (error?.response?.status === NOT_FOUND) {
         await loadData();
         showError(OLD_DATA);

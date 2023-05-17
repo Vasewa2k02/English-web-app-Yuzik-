@@ -24,14 +24,6 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse(swaggerType(UserResponse))
-  @Get()
-  public findAll(): Promise<UserResponse[]> {
-    return this.userService.getAllUsers();
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse(swaggerType(UserResponse))
   @Get(':id')
   public findOne(@Param('id') id: string): Promise<UserResponse> {
     return this.userService.getUserById(+id);

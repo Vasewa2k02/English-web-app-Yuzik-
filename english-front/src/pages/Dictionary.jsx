@@ -537,6 +537,7 @@ const Dictionary = observer(() => {
             lableText="описание"
             isValidValue={isWordValid.description}
             inputType="text"
+            placeholder="необязательное поле"
             setDataHandler={changeWordHandler}
             errorMessage="До 30 символов"
           />
