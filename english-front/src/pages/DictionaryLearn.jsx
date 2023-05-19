@@ -312,7 +312,6 @@ const LexiconProgress = observer(() => {
   };
 
   const selectDictionary = (e) => {
-    console.log(timer);
     setSelectedDictionary(e.value);
     setWords(dictionaries.find((item) => item.id === e.value.id).words);
   };
