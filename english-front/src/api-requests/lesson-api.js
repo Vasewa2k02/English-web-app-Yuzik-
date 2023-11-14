@@ -1,8 +1,8 @@
 import { $authHost } from "./index";
 import { ROUTES } from "../utils/urls";
 
-export const getAdminLessons = async () => {
-  const { data } = await $authHost.get(ROUTES.LESSON_ADMIN_ROUTE);
+export const getLessons = async () => {
+  const { data } = await $authHost.get(ROUTES.LESSON_ROUTE);
   return data;
 };
 

@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Lesson } from '@prisma/client';
+import { Lesson, Topic } from '@prisma/client';
 
 import { swaggerType } from 'src/helpers/swagger/utils';
 import { TaskResponse } from 'src/modules/task/response/task.response';
 
-export class LessonResponse implements Lesson {
+type LessonResponseType = Omit<Lesson, 'topicId'>;
+
+export class LessonResponse implements LessonResponseType {
   @ApiProperty()
   id: number;
 
@@ -15,7 +17,7 @@ export class LessonResponse implements Lesson {
   theory: string;
 
   @ApiProperty()
-  passingPercent: number;
+  topic: Topic;
 
   @ApiProperty(swaggerType(TaskResponse))
   tasks: TaskResponse[];

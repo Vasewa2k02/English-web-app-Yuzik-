@@ -32,6 +32,7 @@ import { REGEXES } from "../utils/regexes";
 
 import * as statisticsApi from "../api-requests/statistics-api";
 import * as grammarProgressApi from "../api-requests/grammar-progress-api";
+import * as topicApi from "../api-requests/topic-api";
 import { INVALID_INPUT, OLD_DATA } from "../utils/error-messages";
 
 const LessonLearn = observer(() => {
@@ -84,17 +85,11 @@ const LessonLearn = observer(() => {
 
     try {
       if (_tasks.length === 0) {
-        const _lessons = await lessonApi.getStudyLessons();
-
-        if (_lessons.length > lessons.length) {
-          setLessons(_lessons);
-
-          showSuccess(
-            "Задания в уроке закончились. Выберите другой урок!",
-            "Завершёно",
-            3000
-          );
-        }
+        showSuccess(
+          "Задания в уроке закончились. Выберите другой урок!",
+          "Завершёно",
+          3000
+        );
 
         setCurrentTask(null);
         setSelectedLesson(null);
@@ -168,11 +163,29 @@ const LessonLearn = observer(() => {
 
   const loadData = async () => {
     try {
-      const _lessons = await lessonApi.getStudyLessons();
+      const _topics = await topicApi.getAllTopics();
+      const _lessons = lessonTransform(_topics);
+
       setLessons(_lessons);
       setTasks(null);
       setSelectedLesson(null);
     } catch (error) {}
+  };
+
+  const lessonTransform = (_topics) => {
+    const _lessons = [];
+
+    _topics.forEach((topic) => {
+      if (topic.lessons.length > 0) {
+        topic.lessons.forEach((lesson) => {
+          _lessons.push({ ...lesson, topicName: topic.name });
+        });
+      } else {
+        _lessons.push({ topicName: topic.name });
+      }
+    });
+
+    return _lessons;
   };
 
   const initFilters = () => {
@@ -224,6 +237,8 @@ const LessonLearn = observer(() => {
   );
 
   const checkAnswer = async (finishedAnswer) => {
+    finishedAnswer = finishedAnswer.toUpperCase();
+
     try {
       if (
         currentTask.translateSentence
@@ -279,6 +294,32 @@ const LessonLearn = observer(() => {
     setCurrentTaskFinishedAnswer(_currentTaskFinishedAnswer);
   };
 
+  const headerTemplate = (data) => {
+    return (
+      <div className="flex align-items-center gap-2">
+        <span className="font-bold">{data.topicName}</span>
+      </div>
+    );
+  };
+
+  const [expandedRows, setExpandedRows] = useState();
+
+  // speech
+
+  const [recordedText, setRecordedText] = useState();
+
+  const SpeechRecognition =
+    window.SpeechRecognition ?? window.webkitSpeechRecognition;
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.lang = "ru-RU";
+
+  recognition.onresult = (event) => {
+    const speechToText = event.results[0][0].transcript;
+    setRecordedText(speechToText);
+  };
+
   return (
     <div className="lesson-learn-container">
       <Toast ref={toast} />
@@ -301,21 +342,20 @@ const LessonLearn = observer(() => {
           selection={selectedLesson}
           onSelectionChange={selectLesson}
           metaKeySelection={true}
+          rowGroupMode="subheader"
+          groupRowsBy="topicName"
+          rowGroupHeaderTemplate={headerTemplate}
+          expandableRowGroups
+          expandedRows={expandedRows}
+          onRowToggle={(e) => setExpandedRows(e.data)}
         >
-          <Column field="name" header="назване" sortable filterField="name" />
-          <Column
-            field="passingPercent"
-            header="проходной процент"
-            headerStyle={{ width: "10px", textAlign: "center" }}
-            bodyStyle={{ textAlign: "center" }}
-            sortable
-          />
+          <Column field="name" header="название" sortable filterField="name" />
         </DataTable>
         <div className="lesson-learn__task-fields">
           <Card
             title={
               currentTask
-                ? "Переведите предложение, расставив слова в нужном порядке"
+                ? "Переведите предложение, расставляя слова в нужном порядке или используйте голосовой ввод"
                 : "Выберите урок"
             }
           >
@@ -344,6 +384,29 @@ const LessonLearn = observer(() => {
                   />
                 ))}
             </div>
+            {currentTask && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 20,
+                  gap: 10,
+                }}
+              >
+                <Button
+                  icon="pi pi-microphone"
+                  rounded
+                  text
+                  onClick={() => recognition.start()}
+                />
+                <Button rounded onClick={() => checkAnswer(recordedText)}>
+                  Применить результат
+                </Button>
+                <p className="m-0">Результат: </p>
+                <p className="m-0">{recordedText}</p>
+              </div>
+            )}
           </Card>
         </div>
       </div>

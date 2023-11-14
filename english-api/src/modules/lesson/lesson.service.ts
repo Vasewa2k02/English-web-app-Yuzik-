@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { GrammarProgressService } from '../grammar-progress/grammar-progress.service';
 import { UserService } from '../user/user.service';
@@ -25,43 +21,47 @@ export class LessonService {
     return await this.lessonRepository.createLesson(createLessonDto);
   }
 
-  async getAdminLessons(): Promise<LessonResponse[]> {
-    return await this.lessonRepository.getAdminLessons();
+  async getLessons(): Promise<LessonResponse[]> {
+    return await this.lessonRepository.getLessons();
   }
 
-  async getLearnLessons(req: RequestWithUser): Promise<LessonResponse[]> {
-    const userId = req.user.id;
-    const enableLesson = await this.lessonRepository.getLessonById(
-      req.user.idEnableLesson,
-    );
-    const nextEnableLesson = await this.lessonRepository.getNextLessonById(
-      req.user.idEnableLesson,
-    );
-    const countComplitedTasksInLesson =
-      await this.grammarProgressService.getCountComplitedTasksInLesson(
-        userId,
-        req.user.idEnableLesson,
-      );
+  // async getLearnLessons(req: RequestWithUser): Promise<LessonResponse[]> {
+  //   const userId = req.user.id;
 
-    if (
-      !enableLesson ||
-      (enableLesson.tasks.length !== 0 &&
-        (100 * countComplitedTasksInLesson) / enableLesson.tasks.length >=
-          enableLesson.passingPercent)
-    ) {
-      await this.userService.updateIdEnableLesson(
-        userId,
-        nextEnableLesson?.id || req.user.idEnableLesson,
-      );
-      return await this.lessonRepository.getLearnLessons(
-        nextEnableLesson?.id || req.user.idEnableLesson,
-      );
-    }
+  //   const enableLesson = await this.lessonRepository.getLessonById(
+  //     req.user.idEnableLesson,
+  //   );
 
-    return await this.lessonRepository.getLearnLessons(
-      enableLesson?.id || req.user.idEnableLesson,
-    );
-  }
+  //   const nextEnableLesson = await this.lessonRepository.getNextLessonById(
+  //     req.user.idEnableLesson,
+  //   );
+
+  //   const countComplitedTasksInLesson =
+  //     await this.grammarProgressService.getCountComplitedTasksInLesson(
+  //       userId,
+  //       req.user.idEnableLesson,
+  //     );
+
+  //   if (
+  //     !enableLesson ||
+  //     (enableLesson.tasks.length !== 0 &&
+  //       (100 * countComplitedTasksInLesson) / enableLesson.tasks.length >=
+  //         enableLesson.passingPercent)
+  //   ) {
+  //     await this.userService.updateIdEnableLesson(
+  //       userId,
+  //       nextEnableLesson?.id || req.user.idEnableLesson,
+  //     );
+
+  //     return await this.lessonRepository.getLearnLessons(
+  //       nextEnableLesson?.id || req.user.idEnableLesson,
+  //     );
+  //   }
+
+  //   return await this.lessonRepository.getLearnLessons(
+  //     enableLesson?.id || req.user.idEnableLesson,
+  //   );
+  // }
 
   async updateLesson(
     id: number,

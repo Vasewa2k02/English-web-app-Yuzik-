@@ -22,6 +22,7 @@ import { REGEXES } from "../utils/regexes";
 
 import * as lessonApi from "../api-requests/lesson-api";
 import * as taskApi from "../api-requests/task-api";
+import * as topicApi from "../api-requests/topic-api";
 import { validateDto } from "../utils/helpers";
 import { Toast } from "primereact/toast";
 import { Slider } from "primereact/slider";
@@ -75,6 +76,8 @@ const Lesson = observer(() => {
   const [taskFilterValue, setTaskFilterValue] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
 
+  const [expandedRows, setExpandedRows] = useState();
+
   useEffect(() => {
     loadData();
     initFilters();
@@ -82,7 +85,19 @@ const Lesson = observer(() => {
 
   const loadData = async () => {
     try {
-      const _lessons = await lessonApi.getAdminLessons();
+      const _topics = await topicApi.getAllTopics();
+      const _lessons = [];
+
+      _topics.forEach((topic) => {
+        if (topic.lessons.length > 0) {
+          topic.lessons.forEach((lesson) => {
+            _lessons.push({ ...lesson, topicName: topic.name });
+          });
+        } else {
+          _lessons.push({ topicName: topic.name });
+        }
+      });
+
       setLessons(_lessons);
       setTasks(null);
       setSelectedLesson(null);
@@ -130,7 +145,6 @@ const Lesson = observer(() => {
     id: "",
     name: "",
     theory: "",
-    passingPercent: 50,
   });
 
   const [isLessonValid, setIsLessonValid] = useState({
@@ -150,7 +164,10 @@ const Lesson = observer(() => {
       id: e.value.id,
       name: e.value.name,
       theory: e.value.theory,
-      passingPercent: e.value.passingPercent,
+    });
+
+    setTopicDto({
+      name: lessons.find((item) => item.id === e.value.id).topicName,
     });
 
     setSelectedTask(null);
@@ -169,22 +186,28 @@ const Lesson = observer(() => {
   const createLesson = async (e) => {
     e.preventDefault();
 
-    if (!validateDto(lessonDto, lessonRegexes, setIsLessonValid)) {
+    if (
+      !validateDto(lessonDto, lessonRegexes, setIsLessonValid) ||
+      !validateDto(topicDto, topicRegexes, setIsTopicValid)
+    ) {
       return;
     }
 
     try {
       const { id, ...lessonDtoWithoutId } = lessonDto;
-      const cteatedLesson = await lessonApi.createLesson(lessonDtoWithoutId);
 
-      lessons.push(cteatedLesson);
+      const { topic, ...lesson } = await lessonApi.createLesson({
+        ...lessonDtoWithoutId,
+        topicName: topicDto.name,
+      });
+
+      lessons.push({ ...lesson, topicName: topic.name });
       setLessons(lessons);
 
       setLessonDto({
         id: selectedLesson?.id,
         name: "",
         theory: "",
-        passingPercent: 50,
       });
     } catch (error) {
       console.log(error);
@@ -217,7 +240,6 @@ const Lesson = observer(() => {
 
       _lessons[_lessonIndex].name = lessonDto.name;
       _lessons[_lessonIndex].theory = lessonDto.theory;
-      _lessons[_lessonIndex].passingPercent = lessonDto.passingPercent;
 
       setLessons(_lessons);
       showSuccess("Урок изменён.");
@@ -233,7 +255,12 @@ const Lesson = observer(() => {
 
   const actionLessonBodyTemplate = (rowData) => {
     return (
-      <Button icon="pi pi-trash" onClick={() => deleteLessonRow(rowData.id)} />
+      rowData.name && (
+        <Button
+          icon="pi pi-trash"
+          onClick={() => deleteLessonRow(rowData.id)}
+        />
+      )
     );
   };
 
@@ -423,6 +450,30 @@ const Lesson = observer(() => {
 
   const taskHeader = renderHeader(taskFilterValue, taskFilterChange, "Задания");
 
+  const headerTemplate = (data) => {
+    return (
+      <div className="flex align-items-center gap-2">
+        <span className="font-bold">{data.topicName}</span>
+      </div>
+    );
+  };
+
+  const [topicDto, setTopicDto] = useState({
+    name: "",
+  });
+
+  const [isTopicValid, setIsTopicValid] = useState({
+    name: true,
+  });
+
+  const topicRegexes = {
+    name: REGEXES.TOPIC_NAME_REGEX,
+  };
+
+  const changeTopicHandler = ({ value }) => {
+    setTopicDto((prev) => ({ ...prev, name: value }));
+  };
+
   return (
     <div className="lesson-container">
       <Toast ref={toast} />
@@ -445,21 +496,19 @@ const Lesson = observer(() => {
           selection={selectedLesson}
           onSelectionChange={selectLesson}
           metaKeySelection={true}
+          rowGroupMode="subheader"
+          groupRowsBy="topicName"
+          rowGroupHeaderTemplate={headerTemplate}
+          expandableRowGroups
+          expandedRows={expandedRows}
+          onRowToggle={(e) => setExpandedRows(e.data)}
         >
           <Column
             field="name"
-            header="назване"
+            header="название"
             editor={(options) => textEditor(options)}
             sortable
             filterField="name"
-          />
-          <Column
-            field="passingPercent"
-            header="проходной процент"
-            editor={(options) => textEditor(options)}
-            headerStyle={{ width: "10px", textAlign: "center" }}
-            bodyStyle={{ textAlign: "center" }}
-            sortable
           />
           <Column body={actionLessonBodyTemplate} />
         </DataTable>
@@ -501,32 +550,29 @@ const Lesson = observer(() => {
       </div>
       <div className="input-area margin-top-30">
         <div className="lesson-fields">
-          <h4 className="lesson-fields__label">Форма для добавления уроков</h4>
+          <h4 className="lesson-fields__label">
+            Форма для добавления тем и/или уроков
+          </h4>
+          <Input
+            className="lesson-fields__name"
+            id="name"
+            value={topicDto.name}
+            lableText="Название темы"
+            isValidValue={isTopicValid.name}
+            inputType="text"
+            setDataHandler={changeTopicHandler}
+            errorMessage="Некорректное название темы"
+          />
           <Input
             className="lesson-fields__name"
             id="name"
             value={lessonDto.name}
-            lableText="Название"
+            lableText="Название урока"
             isValidValue={isLessonValid.name}
             inputType="text"
             setDataHandler={changeLessonHandler}
             errorMessage="Некорректное название словаря"
           />
-          <div className="lesson-fields__passing-percent">
-            <label className="learning-settings__label">
-              Проходной процент
-            </label>
-            <Slider
-              className="lesson-fields__slider"
-              value={lessonDto.passingPercent}
-              min={0}
-              max={100}
-              onChange={(e) =>
-                changeLessonHandler({ id: "passingPercent", value: e.value })
-              }
-            />
-            <label>{lessonDto.passingPercent}%</label>
-          </div>
           <label className="lesson-fields__theory-label">Теория к уроку</label>
           <InputTextarea
             className="lesson-fields__theory"

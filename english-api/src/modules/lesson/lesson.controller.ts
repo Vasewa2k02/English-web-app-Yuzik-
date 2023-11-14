@@ -35,20 +35,20 @@ export class LessonController {
   @ApiBearerAuth()
   @ApiOkResponse(swaggerType(LessonResponse))
   @UseGuards(JwtAuthGuard)
-  @Get('admin')
+  @Get()
   public getAdminLessons(): Promise<LessonResponse[]> {
-    return this.lessonService.getAdminLessons();
+    return this.lessonService.getLessons();
   }
 
-  @ApiBearerAuth()
-  @ApiOkResponse(swaggerType(LessonResponse))
-  @UseGuards(JwtAuthGuard)
-  @Get('learn')
-  public getLearnLessons(
-    @Req() req: RequestWithUser,
-  ): Promise<LessonResponse[]> {
-    return this.lessonService.getLearnLessons(req);
-  }
+  // @ApiBearerAuth()
+  // @ApiOkResponse(swaggerType(LessonResponse))
+  // @UseGuards(JwtAuthGuard)
+  // @Get('learn')
+  // public getLearnLessons(
+  //   @Req() req: RequestWithUser,
+  // ): Promise<LessonResponse[]> {
+  //   return this.lessonService.getLearnLessons(req);
+  // }
 
   @ApiBearerAuth()
   @ApiOkResponse(swaggerType(LessonResponse))

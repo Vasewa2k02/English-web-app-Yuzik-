@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { swaggerType } from 'src/helpers/swagger/utils';
@@ -18,6 +19,8 @@ import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
 import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
+import * as fs from 'fs';
+import { Response as ExpressResponse } from 'express';
 
 @ApiTags('dictionary')
 @Controller('dictionary')
@@ -53,6 +56,26 @@ export class DictionaryController {
     @Req() req: RequestWithUser,
   ): Promise<DictionaryResponse[]> {
     return this.dictionaryService.getUserDictionaries(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('export/:id')
+  public async export(@Param('id') id: string, @Res() res: ExpressResponse) {
+    const fileName = 'dictionary_' + Date.now() + '.json';
+    const fileContent = await this.dictionaryService.exportDictionary(+id);
+
+    fs.writeFileSync(fileName, JSON.stringify(fileContent), 'utf-8');
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+
+    const fileStream = fs.createReadStream(fileName);
+    fileStream.pipe(res);
+
+    fileStream.on('end', () => {
+      fs.unlinkSync(fileName);
+    });
   }
 
   @ApiBearerAuth()

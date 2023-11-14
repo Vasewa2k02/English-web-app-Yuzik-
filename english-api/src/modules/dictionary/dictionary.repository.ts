@@ -4,6 +4,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
 import { DictionaryResponse } from './response/dictionary.response';
+import { WordForExportResponse } from '../word/response/word-for-export.response';
 
 @Injectable()
 export class DictionaryRepository {
@@ -179,5 +180,27 @@ export class DictionaryRepository {
         id,
       },
     });
+  }
+
+  public async exportDictionaryById(
+    id: number,
+  ): Promise<WordForExportResponse[]> {
+    const dictionary = await this.db.dictionary.findMany({
+      where: {
+        id,
+      },
+      select: {
+        words: {
+          select: {
+            englishSpelling: true,
+            transcription: true,
+            russianSpelling: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    return dictionary[0].words;
   }
 }

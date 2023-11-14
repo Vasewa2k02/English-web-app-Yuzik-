@@ -39,11 +39,20 @@ model UserSettings {
   @@map("users_settings")
 }
 
+model Topic {
+  id             Int    @id @default(autoincrement())
+  name           String @unique
+  lessons        Lesson[]
+
+  @@map("topic")
+}
+
 model Lesson {
   id             Int    @id @default(autoincrement())
   name           String
   theory         String
-  passingPercent Int    @map("passing_percent")
+  topicId        Int               @map("topic_id")
+  topic          Topic            @relation(fields: [topicId], references: [id], onDelete: Cascade)
   tasks          Task[]
 
   @@map("lessons")

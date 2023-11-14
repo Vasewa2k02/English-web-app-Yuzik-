@@ -13,6 +13,8 @@ const WORD_DESCRIPTION_REGEX = /^.{0,30}$/;
 const LESSON_NAME_REGEX = /^.{2,30}$/;
 const LESSON_THEORY_REGEX = /^.{1,5000}$/;
 
+const TOPIC_NAME_REGEX = /^.{2,30}$/;
+
 const ENGLISH_SENTENCE_REGEX = /^[a-zA-Z.,:;!?'`—– ]{2,300}$/;
 const RUSSIAN_SENTENCE_REGEX = /^[а-яА-Я.,:;!?'`—– ]{2,300}$/;
 
@@ -33,4 +35,5 @@ export const REGEXES = {
   LESSON_THEORY_REGEX,
   ENGLISH_SENTENCE_REGEX,
   RUSSIAN_SENTENCE_REGEX,
+  TOPIC_NAME_REGEX,
 };

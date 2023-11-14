@@ -14,7 +14,6 @@ export class LessonRepository {
     id: true,
     name: true,
     theory: true,
-    passingPercent: true,
     tasks: {
       select: {
         id: true,
@@ -22,17 +21,33 @@ export class LessonRepository {
         russianSentence: true,
       },
     },
+    topic: {
+      select: {
+        id: true,
+        name: true,
+      },
+    },
   };
 
   public async createLesson(
     createLessonDto: CreateLessonDto,
   ): Promise<LessonResponse> {
-    return await this.db.lesson.create({
+    const { topicName, ...dto } = createLessonDto;
+
+    const lesson = await this.db.lesson.create({
       data: {
-        ...createLessonDto,
+        ...dto,
+        topic: {
+          connectOrCreate: {
+            where: { name: topicName },
+            create: { name: topicName },
+          },
+        },
       },
       select: this.lessonWithTasksSelect,
     });
+
+    return lesson;
   }
 
   public async getLessonById(id: number): Promise<LessonResponse> {
@@ -52,7 +67,7 @@ export class LessonRepository {
     });
   }
 
-  public async getAdminLessons(): Promise<LessonResponse[]> {
+  public async getLessons(): Promise<LessonResponse[]> {
     return await this.db.lesson.findMany({
       orderBy: { id: 'asc' },
       select: this.lessonWithTasksSelect,
@@ -86,10 +101,36 @@ export class LessonRepository {
   }
 
   public async removeLesson(id: number): Promise<void> {
-    await this.db.lesson.delete({
+    const topicLessonsCount = await this.db.topic.findFirst({
       where: {
-        id,
+        lessons: {
+          some: {
+            id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        lessons: {
+          select: {
+            _count: true,
+          },
+        },
       },
     });
+
+    if (topicLessonsCount.lessons.length === 1) {
+      await this.db.topic.delete({
+        where: {
+          id: topicLessonsCount.id,
+        },
+      });
+    } else {
+      await this.db.lesson.delete({
+        where: {
+          id,
+        },
+      });
+    }
   }
 }

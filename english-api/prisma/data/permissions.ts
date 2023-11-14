@@ -75,6 +75,18 @@ export const permissions = [
     context: 'getDictionariesForLearn',
   },
   {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 1,
+    context: 'export',
+  },
+  {
+    method: Method.GET,
+    descriptor: 'DictionaryController',
+    roleId: 2,
+    context: 'export',
+  },
+  {
     method: Method.PATCH,
     descriptor: 'DictionaryController',
     roleId: 1,
@@ -201,5 +213,20 @@ export const permissions = [
     method: Method.GET,
     descriptor: 'StatisticsController',
     roleId: 1,
+  },
+  {
+    method: Method.GET,
+    descriptor: 'TopicController',
+    roleId: 1,
+  },
+  {
+    method: Method.GET,
+    descriptor: 'TopicController',
+    roleId: 2,
+  },
+  {
+    method: Method.POST,
+    descriptor: 'TopicController',
+    roleId: 2,
   },
 ];

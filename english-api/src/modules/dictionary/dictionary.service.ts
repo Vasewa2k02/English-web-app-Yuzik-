@@ -1,17 +1,15 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Dictionary } from '@prisma/client';
-import { NotFoundError } from 'rxjs';
 import { DictionaryRepository } from './dictionary.repository';
 import { CreateDictionaryDto } from './dto/create-dictionary.dto';
 import { UpdateDictionaryDto } from './dto/update-dictionary.dto';
 import { DictionaryReviewResponse } from './response/dictionary-review.response';
 import { DictionaryResponse } from './response/dictionary.response';
+import { WordForExportResponse } from '../word/response/word-for-export.response';
 
 @Injectable()
 export class DictionaryService {
@@ -76,6 +74,12 @@ export class DictionaryService {
   ): Promise<void> {
     await this.checkDictionaryOwner(dictionaryId, userId);
     await this.dictionaryRepository.removeDictionaryById(dictionaryId);
+  }
+
+  public async exportDictionary(
+    dictionaryId: number,
+  ): Promise<WordForExportResponse[]> {
+    return await this.dictionaryRepository.exportDictionaryById(dictionaryId);
   }
 
   public async checkDictionaryOwner(

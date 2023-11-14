@@ -21,6 +21,27 @@ export const getDictionariesLearn = async () => {
   return data;
 };
 
+export const getDictionaryForExport = async (id, dictionaryName) => {
+  try {
+    const response = await $authHost.get(
+      `${ROUTES.DICTIONARY_EXPORT_ROUTE}/${id}`,
+      {
+        responseType: "blob",
+      }
+    );
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = dictionaryName + "_" + Date.now() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading file:", error);
+  }
+};
+
 export const createDictionary = async ({ name, description }) => {
   const { data } = await $authHost.post(ROUTES.DICTIONARY_ROUTE, {
     name,

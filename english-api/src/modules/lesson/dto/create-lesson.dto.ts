@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Lesson } from '@prisma/client';
-import { IsNumber, IsString, Matches } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 
-type CreateLessonType = Pick<Lesson, 'name' | 'theory' | 'passingPercent'>;
+type CreateLessonType = Pick<Lesson, 'name' | 'theory'>;
 
 export class CreateLessonDto implements CreateLessonType {
   @ApiProperty()
@@ -14,6 +14,6 @@ export class CreateLessonDto implements CreateLessonType {
   theory: string;
 
   @ApiProperty()
-  @IsNumber()
-  passingPercent: number;
+  @IsString()
+  topicName: string;
 }

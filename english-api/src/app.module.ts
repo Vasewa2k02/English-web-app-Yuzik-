@@ -14,6 +14,7 @@ import { UserSettingsModule } from './modules/user-settings/user-settings.module
 import { LexiconProgressModule } from './modules/lexicon-progress/lexicon-progress.module';
 import { GrammarProgressModule } from './modules/grammar-progress/grammar-progress.module';
 import { AppGateway } from './app.gateway';
+import { TopicModule } from './modules/topic/topic.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AppGateway } from './app.gateway';
     UserSettingsModule,
     LexiconProgressModule,
     GrammarProgressModule,
+    TopicModule,
   ],
   controllers: [],
   providers: [AppGateway],

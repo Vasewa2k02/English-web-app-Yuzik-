@@ -3,6 +3,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { FilterMatchMode } from "primereact/api";
 import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
 
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -126,6 +127,27 @@ const Dictionary = observer(() => {
 
   const wordHeader = renderHeader(wordFilterValue, wordFilterChange, "Слова");
 
+  const actionDictionaryBodyTemplate = (rowData) => {
+    return (
+      <Button
+        icon="pi pi-file-export"
+        onClick={() => exportDictionaryRow(rowData.id, rowData.name)}
+      />
+    );
+  };
+  const exportDictionaryRow = async (id, dictionaryName) => {
+    try {
+      await dictionaryApi.getDictionaryForExport(id, dictionaryName);
+    } catch (error) {
+      // if (error?.response?.status === NOT_FOUND) {
+      //   await loadData();
+      //   showError(OLD_DATA);
+      // } else {
+      //   showError(INVALID_INPUT);
+      // }
+    }
+  };
+
   return (
     <div className="dictionary-container">
       <Toast ref={toast} />
@@ -151,7 +173,7 @@ const Dictionary = observer(() => {
         >
           <Column
             field="name"
-            header="назване"
+            header="название"
             editor={(options) => textEditor(options)}
             sortable
             filterField="name"
@@ -162,6 +184,7 @@ const Dictionary = observer(() => {
             editor={(options) => textEditor(options)}
             sortable
           />
+          <Column header="экпортировать" body={actionDictionaryBodyTemplate} />
         </DataTable>
         <DataTable
           className="card"

@@ -53,8 +53,4 @@ export class AppGateway {
         Number(this.configService.get('CREATE_WORD_INTERVAL')),
     };
   }
-
-  // handleConnection(client: any) {}
-
-  // handleDisconnect(client: any) {}
 }

@@ -25,22 +25,16 @@ export class MailService {
         ...transportOptions,
       });
 
-      console.log('---------------------');
-
-      console.log(
-        await this.transport.sendMail({
-          to: reciver,
-          from: this.configService.get('SMTP_USER'),
-          subject: 'Активация аккаунта на ' + this.configService.get('API_URL'),
-          html: `
-        <div>
-          <h1>Пароль:</h1>
-          <p>${firstPassword}</p>
-        </div>`,
-        }),
-      );
-
-      console.log('---------------------');
+      await this.transport.sendMail({
+        to: reciver,
+        from: this.configService.get('SMTP_USER'),
+        subject: 'Активация аккаунта на ' + this.configService.get('API_URL'),
+        html: `
+      <div>
+        <h1>Пароль:</h1>
+        <p>${firstPassword}</p>
+      </div>`,
+      });
 
       this.transport.close();
     } catch (error) {
