@@ -25,7 +25,6 @@ import * as taskApi from "../api-requests/task-api";
 import * as topicApi from "../api-requests/topic-api";
 import { validateDto } from "../utils/helpers";
 import { Toast } from "primereact/toast";
-import { Slider } from "primereact/slider";
 import { Message } from "primereact/message";
 import { NOT_FOUND } from "../utils/statuses";
 import {

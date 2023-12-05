@@ -72,6 +72,12 @@ const LessonLearn = observer(() => {
     []
   );
 
+  const [currentTaskCount, setCurrentTaskCount] = useState({
+    finished: 0,
+    all: 0,
+    correct: 0,
+  });
+
   useEffect(() => {
     loadData();
     initFilters();
@@ -213,11 +219,13 @@ const LessonLearn = observer(() => {
 
   const selectLesson = (e) => {
     setSelectedLesson(e.value);
-    setTasks(
-      lessons
-        .find((item) => item.id === e.value.id)
-        .tasks.sort(() => Math.random() - 0.5)
-    );
+    const _lesson = lessons.find((item) => item.id === e.value.id);
+    setTasks(_lesson.tasks.sort(() => Math.random() - 0.5));
+    setCurrentTaskCount({
+      finished: 0,
+      all: _lesson.tasks.length,
+      correct: 0,
+    });
   };
 
   const lessonFilterChange = (e) => {
@@ -237,7 +245,8 @@ const LessonLearn = observer(() => {
   );
 
   const checkAnswer = async (finishedAnswer) => {
-    finishedAnswer = finishedAnswer.toUpperCase();
+    setCurrentTaskCount((prev) => ({ ...prev, finished: prev.finished + 1 }));
+    finishedAnswer = finishedAnswer?.toUpperCase();
 
     try {
       if (
@@ -251,10 +260,11 @@ const LessonLearn = observer(() => {
         await grammarProgressApi.createGrammarProgress({
           taskId: currentTask.id,
         });
+        setCurrentTaskCount((prev) => ({ ...prev, correct: prev.correct + 1 }));
       } else {
         showError(
           `Правильно: ${currentTask.mainSentence} - ${currentTask.translateSentence}`,
-          "Ответ не верный :("
+          "Ответ неверный :("
         );
       }
 
@@ -357,6 +367,11 @@ const LessonLearn = observer(() => {
               currentTask
                 ? "Переведите предложение, расставляя слова в нужном порядке или используйте голосовой ввод"
                 : "Выберите урок"
+            }
+            subTitle={
+              currentTask
+                ? `Заданий выполнено: ${currentTaskCount.finished}/${currentTaskCount.all}. Из них верно: ${currentTaskCount.correct}`
+                : ""
             }
           >
             {currentTask && <p className="m-0">{currentTask.mainSentence}</p>}

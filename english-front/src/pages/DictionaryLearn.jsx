@@ -105,7 +105,7 @@ const LexiconProgress = observer(() => {
       } else {
         showError(
           `Правильно: ${socketWord.englishSpelling} - ${socketWord.russianSpelling}`,
-          "Ответ не верный :("
+          "Ответ неверный :("
         );
       }
     } catch (error) {
@@ -256,7 +256,7 @@ const LexiconProgress = observer(() => {
       } else {
         showError(
           `Правильно: ${currentWord.mainSpelling} - ${currentWord.translateSpelling}`,
-          "Ответ не верный :("
+          "Ответ неверный :("
         );
       }
 

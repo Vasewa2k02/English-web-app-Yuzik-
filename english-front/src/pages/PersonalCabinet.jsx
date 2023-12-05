@@ -88,7 +88,7 @@ const PersonalCabinet = observer(() => {
       });
       showSuccess("Пароль изменён");
     } catch (error) {
-      showError("Введён не верный текущий пароль");
+      showError("Введён неверный текущий пароль");
     }
   };
 
