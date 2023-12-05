@@ -135,6 +135,7 @@ const Dictionary = observer(() => {
       />
     );
   };
+
   const exportDictionaryRow = async (id, dictionaryName) => {
     try {
       await dictionaryApi.getDictionaryForExport(id, dictionaryName);

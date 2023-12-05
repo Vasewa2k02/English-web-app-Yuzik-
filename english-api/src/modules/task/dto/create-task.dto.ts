@@ -11,12 +11,10 @@ export class CreateTaskDto implements CreateTaskType {
   @ApiProperty()
   @Matches(/^[a-zA-Z.,:;!?'`—– ]{2,300}$/)
   englishSentence: string;
-
-  @ApiProperty()
-  @Matches(/^[а-яА-Я.,:;!?'`—– ]{2,300}$/)
-  russianSentence: string;
-
   @ApiProperty()
   @IsNumber()
   lessonId: number;
+  @ApiProperty()
+  @Matches(/^[а-яА-Я.,:;!?'`—– ]{2,300}$/)
+  russianSentence: string;
 }

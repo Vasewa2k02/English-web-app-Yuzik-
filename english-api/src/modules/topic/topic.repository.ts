@@ -7,8 +7,6 @@ import { CreateTopicDto } from './dto/create-topic.dto';
 
 @Injectable()
 export class TopicRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private fullSelect = {
     id: true,
     name: true,
@@ -29,6 +27,20 @@ export class TopicRepository {
     },
   };
 
+  constructor(private readonly db: DatabaseService) {}
+
+  public async createTopic(createTopicDto: CreateTopicDto): Promise<void> {
+    await this.db.topic.create({
+      data: { ...createTopicDto },
+    });
+  }
+
+  public async getAllTopics(): Promise<TopicResponse[]> {
+    return await this.db.topic.findMany({
+      select: this.fullSelect,
+    });
+  }
+
   public async getTopicById(id: number): Promise<TopicResponse> {
     return await this.db.topic.findUnique({
       where: { id },
@@ -43,15 +55,11 @@ export class TopicRepository {
     });
   }
 
-  public async getAllTopics(): Promise<TopicResponse[]> {
-    return await this.db.topic.findMany({
-      select: this.fullSelect,
-    });
-  }
-
-  public async createTopic(createTopicDto: CreateTopicDto): Promise<void> {
-    await this.db.topic.create({
-      data: { ...createTopicDto },
+  public async removeTopic(id: number): Promise<void> {
+    await this.db.topic.delete({
+      where: {
+        id,
+      },
     });
   }
 
@@ -65,14 +73,6 @@ export class TopicRepository {
       },
       data: {
         ...updateTopicDto,
-      },
-    });
-  }
-
-  public async removeTopic(id: number): Promise<void> {
-    await this.db.topic.delete({
-      where: {
-        id,
       },
     });
   }

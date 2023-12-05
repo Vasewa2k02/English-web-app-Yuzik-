@@ -7,13 +7,28 @@ import { TaskResponse } from './response/task.response';
 
 @Injectable()
 export class TaskRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private selectForLesson = {
     id: true,
     englishSentence: true,
     russianSentence: true,
   };
+
+  constructor(private readonly db: DatabaseService) {}
+
+  public async createTask(createTaskDto: CreateTaskDto): Promise<TaskResponse> {
+    const { lessonId, ...dto } = createTaskDto;
+    return await this.db.task.create({
+      data: {
+        ...dto,
+        lesson: {
+          connect: {
+            id: lessonId,
+          },
+        },
+      },
+      select: this.selectForLesson,
+    });
+  }
 
   public async getTaskById(id: number): Promise<TaskResponse> {
     return await this.db.task.findUnique({
@@ -35,18 +50,11 @@ export class TaskRepository {
     });
   }
 
-  public async createTask(createTaskDto: CreateTaskDto): Promise<TaskResponse> {
-    const { lessonId, ...dto } = createTaskDto;
-    return await this.db.task.create({
-      data: {
-        ...dto,
-        lesson: {
-          connect: {
-            id: lessonId,
-          },
-        },
+  public async removeTask(id: number): Promise<void> {
+    await this.db.task.delete({
+      where: {
+        id,
       },
-      select: this.selectForLesson,
     });
   }
 
@@ -62,14 +70,6 @@ export class TaskRepository {
         ...updateTaskDto,
       },
       select: this.selectForLesson,
-    });
-  }
-
-  public async removeTask(id: number): Promise<void> {
-    await this.db.task.delete({
-      where: {
-        id,
-      },
     });
   }
 }

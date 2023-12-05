@@ -8,14 +8,11 @@ export type WordForExportResponse = Pick<
 
 export class WordForDictionaryResponse implements WordForExportResponse {
   @ApiProperty()
-  englishSpelling: string;
-
+  description: string;
   @ApiProperty()
-  transcription: string;
-
+  englishSpelling: string;
   @ApiProperty()
   russianSpelling: string;
-
   @ApiProperty()
-  description: string;
+  transcription: string;
 }

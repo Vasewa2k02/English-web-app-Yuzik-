@@ -8,8 +8,6 @@ import { LessonResponse } from './response/lesson.response';
 
 @Injectable()
 export class LessonRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private lessonWithTasksSelect = {
     id: true,
     name: true,
@@ -28,6 +26,8 @@ export class LessonRepository {
       },
     },
   };
+
+  constructor(private readonly db: DatabaseService) {}
 
   public async createLesson(
     createLessonDto: CreateLessonDto,
@@ -50,30 +50,6 @@ export class LessonRepository {
     return lesson;
   }
 
-  public async getLessonById(id: number): Promise<LessonResponse> {
-    return await this.db.lesson.findUnique({
-      where: { id },
-      select: this.lessonWithTasksSelect,
-    });
-  }
-
-  public async getNextLessonById(id: number): Promise<LessonResponse> {
-    return await this.db.lesson.findFirst({
-      where: {
-        id: { gt: id },
-      },
-      orderBy: { id: 'asc' },
-      select: this.lessonWithTasksSelect,
-    });
-  }
-
-  public async getLessons(): Promise<LessonResponse[]> {
-    return await this.db.lesson.findMany({
-      orderBy: { id: 'asc' },
-      select: this.lessonWithTasksSelect,
-    });
-  }
-
   public async getLearnLessons(lessonId: number): Promise<LessonResponse[]> {
     return await this.db.lesson.findMany({
       where: {
@@ -85,17 +61,26 @@ export class LessonRepository {
     });
   }
 
-  public async updateLesson(
-    id: number,
-    updateLessonDto: UpdateLessonDto,
-  ): Promise<LessonResponse> {
-    return await this.db.lesson.update({
+  public async getLessonById(id: number): Promise<LessonResponse> {
+    return await this.db.lesson.findUnique({
+      where: { id },
+      select: this.lessonWithTasksSelect,
+    });
+  }
+
+  public async getLessons(): Promise<LessonResponse[]> {
+    return await this.db.lesson.findMany({
+      orderBy: { id: 'asc' },
+      select: this.lessonWithTasksSelect,
+    });
+  }
+
+  public async getNextLessonById(id: number): Promise<LessonResponse> {
+    return await this.db.lesson.findFirst({
       where: {
-        id,
+        id: { gt: id },
       },
-      data: {
-        ...updateLessonDto,
-      },
+      orderBy: { id: 'asc' },
       select: this.lessonWithTasksSelect,
     });
   }
@@ -132,5 +117,20 @@ export class LessonRepository {
         },
       });
     }
+  }
+
+  public async updateLesson(
+    id: number,
+    updateLessonDto: UpdateLessonDto,
+  ): Promise<LessonResponse> {
+    return await this.db.lesson.update({
+      where: {
+        id,
+      },
+      data: {
+        ...updateLessonDto,
+      },
+      select: this.lessonWithTasksSelect,
+    });
   }
 }

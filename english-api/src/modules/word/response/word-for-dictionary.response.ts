@@ -3,17 +3,13 @@ import { Word } from '@prisma/client';
 
 export class WordForDictionaryResponse implements Word {
   @ApiProperty()
-  id: number;
-
+  description: string;
   @ApiProperty()
   englishSpelling: string;
-
   @ApiProperty()
-  transcription: string;
-
+  id: number;
   @ApiProperty()
   russianSpelling: string;
-
   @ApiProperty()
-  description: string;
+  transcription: string;
 }

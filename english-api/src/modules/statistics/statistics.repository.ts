@@ -6,20 +6,19 @@ import { StatisticsResponse } from './response/statistics.response';
 
 @Injectable()
 export class StatisticsRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private lexiconProgressSelect = {
     id: true,
     progressCount: true,
     isLearned: true,
     wordId: true,
   };
-
   private statisticsSelect = {
     words: true,
     tasks: true,
     quizPoints: true,
   };
+
+  constructor(private readonly db: DatabaseService) {}
 
   public async createOrUpdateStatistics(
     userId: number,

@@ -378,9 +378,58 @@ const Dictionary = observer(() => {
 
   const wordHeader = renderHeader(wordFilterValue, wordFilterChange, "Слова");
 
+  const [fileContent, setFileContent] = useState(null);
+  const [currentImportDictionaryId, setCurrentImportDictionaryId] = useState();
+
+  const actionDictionaryImport = (rowData) => {
+    return (
+      <Button
+        icon="pi pi-file-export"
+        onClick={() => openFilePicker(rowData)}
+      />
+    );
+  };
+
+  const openFilePicker = (rowData) => {
+    setCurrentImportDictionaryId(rowData.id);
+    document.getElementById("fileInput").click();
+  };
+
+  const handleFileChange = (event) => {
+    try {
+      const file = event.target.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+          const content = e.target.result;
+          setFileContent(content);
+
+          await wordApi.createWordArray(
+            currentImportDictionaryId,
+            JSON.parse(content)
+          );
+
+          loadData();
+        };
+
+        reader.readAsText(file);
+      }
+    } catch (error) {
+      showError("Структура файла не соответствует требованиям");
+    }
+  };
+
   return (
     <div className="dictionary-container">
       <Toast ref={toast} />
+      <input
+        type="file"
+        id="fileInput"
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
       <div className="tables">
         <DataTable
           className="card"
@@ -421,6 +470,7 @@ const Dictionary = observer(() => {
             bodyStyle={{ textAlign: "center" }}
           />
           <Column body={actionDictionaryBodyTemplate} />
+          <Column header="импорт" body={actionDictionaryImport} />
         </DataTable>
         <DataTable
           className="card"

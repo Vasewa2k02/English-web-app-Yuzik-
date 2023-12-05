@@ -8,16 +8,6 @@ export class GrammarProgressService {
     private readonly grammarProgressRepository: GrammarProgressRepository,
   ) {}
 
-  public async getCountComplitedTasksInLesson(
-    userId: number,
-    lessonId: number,
-  ): Promise<number> {
-    return await this.grammarProgressRepository.getCountComplitedTasksInLesson(
-      userId,
-      lessonId,
-    );
-  }
-
   public async createOrUpdateGrammarProgress(
     userId: number,
     taskId: number,
@@ -25,6 +15,16 @@ export class GrammarProgressService {
     await this.grammarProgressRepository.createOrUpdateGrammarProgress(
       userId,
       taskId,
+    );
+  }
+
+  public async getCountComplitedTasksInLesson(
+    userId: number,
+    lessonId: number,
+  ): Promise<number> {
+    return await this.grammarProgressRepository.getCountComplitedTasksInLesson(
+      userId,
+      lessonId,
     );
   }
 }

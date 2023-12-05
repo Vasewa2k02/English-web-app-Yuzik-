@@ -12,6 +12,15 @@ export const createWord = async (dictionaryId, word) => {
   return data;
 };
 
+export const createWordArray = async (dictionaryId, words) => {
+  const { data } = await $authHost.post(
+    `${ROUTES.WORD_IMPORT_ROUTE}/${dictionaryId}`,
+    { wordArray: words }
+  );
+
+  return data;
+};
+
 export const updateWord = async (wordId, word) => {
   const { data } = await $authHost.patch(`${ROUTES.WORD_ROUTE}/${wordId}`, {
     ...word,

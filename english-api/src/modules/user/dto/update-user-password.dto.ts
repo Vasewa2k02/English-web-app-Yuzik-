@@ -4,9 +4,8 @@ import { Matches } from 'class-validator';
 export class UpdateUserPasswordDto {
   @ApiProperty()
   @Matches(/^.{4,16}$/)
-  oldPassword: string;
-
+  newPassword: string;
   @ApiProperty()
   @Matches(/^.{4,16}$/)
-  newPassword: string;
+  oldPassword: string;
 }

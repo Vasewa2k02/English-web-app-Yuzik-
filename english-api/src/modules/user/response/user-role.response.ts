@@ -21,12 +21,11 @@ class RolePermissions implements PermissionsOmitRoleId {
 type RoleOmitUserId = Omit<Role, 'userId'>;
 
 export class UserRoleResponse implements RoleOmitUserId {
+  @ApiProperty(swaggerType(RolePermissions))
+  permissions: RolePermissions[];
   @ApiProperty()
   id: number;
 
   @ApiProperty()
   title: string;
-
-  @ApiProperty(swaggerType(RolePermissions))
-  permissions: RolePermissions[];
 }

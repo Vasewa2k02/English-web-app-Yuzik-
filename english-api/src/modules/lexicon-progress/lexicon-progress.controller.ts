@@ -26,7 +26,7 @@ export class LexiconProgressController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(
+  private create(
     @Req() req: RequestWithUser,
     @Body() createLexiconProgressDto: CreateLexiconProgressDto,
   ) {

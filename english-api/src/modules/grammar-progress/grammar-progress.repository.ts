@@ -6,20 +6,6 @@ import { DatabaseService } from 'src/database/database.service';
 export class GrammarProgressRepository {
   constructor(private readonly db: DatabaseService) {}
 
-  public async getCountComplitedTasksInLesson(
-    userId: number,
-    lessonId: number,
-  ): Promise<number> {
-    return await this.db.grammarProgress.count({
-      where: {
-        userId,
-        task: {
-          lessonId,
-        },
-      },
-    });
-  }
-
   public async createOrUpdateGrammarProgress(
     userId: number,
     taskId: number,
@@ -44,6 +30,20 @@ export class GrammarProgressRepository {
         },
       },
       update: {},
+    });
+  }
+
+  public async getCountComplitedTasksInLesson(
+    userId: number,
+    lessonId: number,
+  ): Promise<number> {
+    return await this.db.grammarProgress.count({
+      where: {
+        userId,
+        task: {
+          lessonId,
+        },
+      },
     });
   }
 }

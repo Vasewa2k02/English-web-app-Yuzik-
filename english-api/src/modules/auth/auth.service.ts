@@ -24,16 +24,27 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  public async verifyPassword(
-    enteredPassword: string,
-    password: string,
-  ): Promise<void> {
-    if (!(await bcrypt.compare(enteredPassword, password))) {
-      throw new HttpException(
-        'Wrong credentials provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  private getCookieForLogout(): string {
+    const cookieForLogout = cookie.serialize('refreshToken', null, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 0,
+    });
+
+    return cookieForLogout;
+  }
+
+  public getAccessJwtToken(userId: number): string {
+    const payload: TokenPayload = { userId };
+
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
+      )}s`,
+    });
+
+    return token;
   }
 
   public async getAuthenticatedUser(
@@ -51,10 +62,41 @@ export class AuthService {
     }
   }
 
-  public async registration(
-    registrationDto: UserRegistrationDto,
-  ): Promise<void> {
-    await this.userService.create(registrationDto);
+  public getCookieWithJwtRefreshToken(userId: number): CookieWithRefreshToken {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      expiresIn: `${this.configService.get(
+        'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
+      )}s`,
+    });
+    const refreshTokenCookie = cookie.serialize('refreshToken', token, {
+      httpOnly: true,
+      secure: true,
+      path: '/',
+      maxAge: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
+    });
+    return {
+      refreshTokenCookie,
+      token,
+    };
+  }
+
+  public async getCurrentUser(req: RequestWithUser): Promise<UserResponse> {
+    return await this.userService.getFullUserById(req.user.id);
+  }
+
+  public async getUserIfRefreshTokenMatches(
+    refreshToken: string,
+    userId: number,
+  ): Promise<UserResponse> {
+    console.log(await this.sessionService.getRefreshToken(userId));
+
+    if (refreshToken !== (await this.sessionService.getRefreshToken(userId))) {
+      throw new HttpException('XUIXUXI', HttpStatus.FORBIDDEN);
+    }
+
+    return await this.userService.getUserById(userId);
   }
 
   public async login(req: RequestWithUser): Promise<UserLoginResponse> {
@@ -79,56 +121,6 @@ export class AuthService {
     };
   }
 
-  public getAccessJwtToken(userId: number): string {
-    const payload: TokenPayload = { userId };
-
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
-      expiresIn: `${this.configService.get(
-        'JWT_ACCESS_TOKEN_EXPIRATION_TIME',
-      )}s`,
-    });
-
-    return token;
-  }
-
-  public getCookieWithJwtRefreshToken(userId: number): CookieWithRefreshToken {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-      expiresIn: `${this.configService.get(
-        'JWT_REFRESH_TOKEN_EXPIRATION_TIME',
-      )}s`,
-    });
-    const refreshTokenCookie = cookie.serialize('refreshToken', token, {
-      httpOnly: true,
-      secure: true,
-      path: '/',
-      maxAge: this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME'),
-    });
-    return {
-      refreshTokenCookie,
-      token,
-    };
-  }
-
-  public async getUserIfRefreshTokenMatches(
-    refreshToken: string,
-    userId: number,
-  ): Promise<UserResponse> {
-    console.log(await this.sessionService.getRefreshToken(userId));
-
-    if (refreshToken !== (await this.sessionService.getRefreshToken(userId))) {
-      throw new HttpException('XUIXUXI', HttpStatus.FORBIDDEN);
-    }
-
-    return await this.userService.getUserById(userId);
-  }
-
-  public async getCurrentUser(req: RequestWithUser): Promise<UserResponse> {
-    return await this.userService.getFullUserById(req.user.id);
-  }
-
   public async refresh(req: RequestWithUser): Promise<AccessTokenResponse> {
     const accessToken = this.getAccessJwtToken(req.user.id);
 
@@ -145,19 +137,27 @@ export class AuthService {
     return { accessToken };
   }
 
+  public async registration(
+    registrationDto: UserRegistrationDto,
+  ): Promise<void> {
+    await this.userService.create(registrationDto);
+  }
+
   public async removeRefreshToken(req: RequestWithUser): Promise<void> {
     await this.sessionService.removeRefreshToken(req.user.id);
 
     req.res.setHeader('Set-Cookie', this.getCookieForLogout());
   }
 
-  private getCookieForLogout(): string {
-    const cookieForLogout = cookie.serialize('refreshToken', null, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 0,
-    });
-
-    return cookieForLogout;
+  public async verifyPassword(
+    enteredPassword: string,
+    password: string,
+  ): Promise<void> {
+    if (!(await bcrypt.compare(enteredPassword, password))) {
+      throw new HttpException(
+        'Wrong credentials provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

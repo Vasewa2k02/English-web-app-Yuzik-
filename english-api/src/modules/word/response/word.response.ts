@@ -5,21 +5,16 @@ import { DictionaryForWordResponse } from 'src/modules/dictionary/response/dicti
 
 export class WordResponse implements Word {
   @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  englishSpelling: string;
-
-  @ApiProperty()
-  transcription: string;
-
-  @ApiProperty()
-  russianSpelling: string;
-
-  @ApiProperty()
   description: string;
-
   @ApiProperty()
   @ApiProperty(swaggerType(DictionaryForWordResponse))
   dictionaries: DictionaryForWordResponse[];
+  @ApiProperty()
+  englishSpelling: string;
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  russianSpelling: string;
+  @ApiProperty()
+  transcription: string;
 }

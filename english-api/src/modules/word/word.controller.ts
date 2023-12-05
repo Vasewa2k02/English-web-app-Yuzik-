@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -18,6 +17,7 @@ import RequestWithUser from '../auth/interface/request-with-user.interface';
 import { swaggerType } from 'src/helpers/swagger/utils';
 import { WordResponse } from './response/word.response';
 import { WordForDictionaryResponse } from './response/word-for-dictionary.response';
+import { CreateWordArrayDto } from './dto/create-word-array.dto';
 
 @ApiTags('word')
 @Controller('word')
@@ -40,18 +40,17 @@ export class WordController {
   }
 
   @ApiBearerAuth()
-  @ApiOkResponse(swaggerType(WordResponse))
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  public updateWord(
+  @Post('import/:id')
+  public createWordArray(
     @Req() req: RequestWithUser,
-    @Param('id') wordId: string,
-    @Body() updateWordDto: UpdateWordDto,
-  ): Promise<WordResponse> {
-    return this.wordService.updateWord(
-      +req.user.roleId,
-      +wordId,
-      updateWordDto,
+    @Param('id') dictionaryId: string,
+    @Body() createWordArrayDto: CreateWordArrayDto,
+  ): Promise<CreateWordDto[]> {
+    return this.wordService.createWordArray(
+      +req.user.id,
+      +dictionaryId,
+      createWordArrayDto,
     );
   }
 
@@ -67,6 +66,22 @@ export class WordController {
       +req.user.id,
       +id,
       +dictionaryId,
+    );
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(WordResponse))
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  public updateWord(
+    @Req() req: RequestWithUser,
+    @Param('id') wordId: string,
+    @Body() updateWordDto: UpdateWordDto,
+  ): Promise<WordResponse> {
+    return this.wordService.updateWord(
+      +req.user.roleId,
+      +wordId,
+      updateWordDto,
     );
   }
 }

@@ -5,8 +5,6 @@ import { LexiconProgressResponse } from './response/lexicon-progress.response';
 
 @Injectable()
 export class LexiconProgressRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private lexiconProgressSelect = {
     id: true,
     progressCount: true,
@@ -14,20 +12,7 @@ export class LexiconProgressRepository {
     wordId: true,
   };
 
-  public async getLexiconProgress(
-    userId: number,
-    wordId: number,
-  ): Promise<LexiconProgressResponse> {
-    return await this.db.lexiconProgress.findUnique({
-      where: {
-        userId_wordId: {
-          userId: userId,
-          wordId: wordId,
-        },
-      },
-      select: this.lexiconProgressSelect,
-    });
-  }
+  constructor(private readonly db: DatabaseService) {}
 
   public async createOrUpdateLexiconProgress(
     userId: number,
@@ -59,6 +44,21 @@ export class LexiconProgressRepository {
       update: {
         progressCount,
         isLearned,
+      },
+      select: this.lexiconProgressSelect,
+    });
+  }
+
+  public async getLexiconProgress(
+    userId: number,
+    wordId: number,
+  ): Promise<LexiconProgressResponse> {
+    return await this.db.lexiconProgress.findUnique({
+      where: {
+        userId_wordId: {
+          userId: userId,
+          wordId: wordId,
+        },
       },
       select: this.lexiconProgressSelect,
     });

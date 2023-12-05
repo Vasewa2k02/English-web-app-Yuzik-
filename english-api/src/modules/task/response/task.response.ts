@@ -8,11 +8,9 @@ type TaskResponseType = Pick<
 
 export class TaskResponse implements TaskResponseType {
   @ApiProperty()
-  id: number;
-
-  @ApiProperty()
   englishSentence: string;
-
+  @ApiProperty()
+  id: number;
   @ApiProperty()
   russianSentence: string;
 }

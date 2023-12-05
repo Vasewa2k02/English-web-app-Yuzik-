@@ -4,20 +4,15 @@ import { WordForDictionaryResponse } from './word-for-dictionary.response';
 
 export class WordReviewResponse implements WordForDictionaryResponse {
   @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  englishSpelling: string;
-
-  @ApiProperty()
-  transcription: string;
-
-  @ApiProperty()
-  russianSpelling: string;
-
+  lexiconProgress: LexiconProgressResponse;
   @ApiProperty()
   description: string;
-
   @ApiProperty()
-  lexiconProgress: LexiconProgressResponse;
+  englishSpelling: string;
+  @ApiProperty()
+  id: number;
+  @ApiProperty()
+  russianSpelling: string;
+  @ApiProperty()
+  transcription: string;
 }

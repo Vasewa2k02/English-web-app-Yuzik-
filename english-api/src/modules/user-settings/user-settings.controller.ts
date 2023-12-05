@@ -23,14 +23,14 @@ export class UserSettingsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  getUserSettings(@Req() req: RequestWithUser): Promise<UserSettingsResponse> {
+  private getUserSettings(@Req() req: RequestWithUser): Promise<UserSettingsResponse> {
     return this.userSettingsService.getUserSettings(+req.user.id);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch()
-  update(
+  private update(
     @Req() req: RequestWithUser,
     @Body() updateUserSettingsDto: UpdateUserSettingsDto,
   ): Promise<void> {

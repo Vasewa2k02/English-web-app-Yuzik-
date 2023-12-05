@@ -2,11 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateStatisticDto {
   @ApiProperty()
-  words?: number;
-
+  quizPoints?: number;
   @ApiProperty()
   tasks?: number;
-
   @ApiProperty()
-  quizPoints?: number;
+  words?: number;
 }

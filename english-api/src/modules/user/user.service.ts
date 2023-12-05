@@ -18,6 +18,28 @@ export class UserService {
     private readonly mailService: MailService,
   ) {}
 
+  public async changeUserPassword(
+    user: UserResponse,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ): Promise<void> {
+    if (
+      !(await bcrypt.compare(
+        updateUserPasswordDto.oldPassword,
+        await this.userRepository.getHashedUserPassword(user.id),
+      ))
+    ) {
+      throw new HttpException('Passwords not matches', HttpStatus.BAD_REQUEST);
+    }
+
+    await this.userRepository.updateUserPassword(
+      user.id,
+      await bcrypt.hash(
+        updateUserPasswordDto.newPassword,
+        +this.configService.get('SALT'),
+      ),
+    );
+  }
+
   public async create(createUserDto: CreateUserDto) {
     if (await this.userRepository.getUserByEmail(createUserDto.email)) {
       throw new HttpException('User already exists', HttpStatus.CONFLICT);
@@ -40,16 +62,16 @@ export class UserService {
     return await this.userRepository.getAllUsers();
   }
 
-  public async getUserById(id: number): Promise<UserResponse> {
-    return await this.userRepository.getUserById(id);
+  public async getFullUserById(id: number): Promise<UserResponse> {
+    return await this.userRepository.getUserByIdWithPermissions(id);
   }
 
   public async getUserByEmailWithPassword(email: string): Promise<User> {
     return await this.userRepository.getUserByEmailWithPassword(email);
   }
 
-  public async getFullUserById(id: number): Promise<UserResponse> {
-    return await this.userRepository.getUserByIdWithPermissions(id);
+  public async getUserById(id: number): Promise<UserResponse> {
+    return await this.userRepository.getUserById(id);
   }
 
   public async updateIdEnableLesson(
@@ -59,28 +81,6 @@ export class UserService {
     return await this.userRepository.updateIdEnableLesson(
       userId,
       idEnableLesson,
-    );
-  }
-
-  public async changeUserPassword(
-    user: UserResponse,
-    updateUserPasswordDto: UpdateUserPasswordDto,
-  ): Promise<void> {
-    if (
-      !(await bcrypt.compare(
-        updateUserPasswordDto.oldPassword,
-        await this.userRepository.getHashedUserPassword(user.id),
-      ))
-    ) {
-      throw new HttpException('Passwords not matches', HttpStatus.BAD_REQUEST);
-    }
-
-    await this.userRepository.updateUserPassword(
-      user.id,
-      await bcrypt.hash(
-        updateUserPasswordDto.newPassword,
-        +this.configService.get('SALT'),
-      ),
     );
   }
 }

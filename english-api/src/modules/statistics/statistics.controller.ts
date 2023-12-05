@@ -24,7 +24,7 @@ export class StatisticsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(
+  private create(
     @Req() req: RequestWithUser,
     @Body() createStatisticDto: CreateStatisticDto,
   ) {
@@ -37,14 +37,14 @@ export class StatisticsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('all')
-  getAllStatistics(): Promise<StatisticsResponse[]> {
+  private getAllStatistics(): Promise<StatisticsResponse[]> {
     return this.statisticsService.getAllStatistics();
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('user-all')
-  getUserAllStatistics(
+  private getUserAllStatistics(
     @Req() req: RequestWithUser,
   ): Promise<StatisticsResponse> {
     return this.statisticsService.getUserAllStatistics(+req.user.id);
@@ -53,7 +53,7 @@ export class StatisticsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('user-today')
-  getUserTodayStatistics(
+  private getUserTodayStatistics(
     @Req() req: RequestWithUser,
   ): Promise<StatisticsResponse> {
     return this.statisticsService.getUserTodayStatistics(+req.user.id);

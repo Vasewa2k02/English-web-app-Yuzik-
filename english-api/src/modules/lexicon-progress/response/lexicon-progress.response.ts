@@ -9,13 +9,10 @@ type LexiconProgressType = Pick<
 export class LexiconProgressResponse implements LexiconProgressType {
   @ApiProperty()
   id: number;
-
-  @ApiProperty()
-  progressCount: number;
-
   @ApiProperty()
   isLearned: boolean;
-
+  @ApiProperty()
+  progressCount: number;
   @ApiProperty()
   wordId: number;
 }

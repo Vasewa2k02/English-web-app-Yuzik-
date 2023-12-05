@@ -18,10 +18,8 @@ export class UserSettingsResponse implements UserSettingsType {
   @ApiProperty()
   @IsNumber()
   countRepeatWordsSimultaneously: number;
-
-  @ApiProperty()
-  learningModeWords: LearningMode;
-
   @ApiProperty()
   learningModeTasks: LearningMode;
+  @ApiProperty()
+  learningModeWords: LearningMode;
 }

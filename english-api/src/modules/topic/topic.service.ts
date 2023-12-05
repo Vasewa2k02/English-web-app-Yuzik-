@@ -25,17 +25,17 @@ export class TopicService {
     return `This action returns a #${id} topic`;
   }
 
-  update(id: number, updateTopicDto: UpdateTopicDto) {
-    return `This action updates a #${id} topic`;
+  async isTopicExists(name: string) {
+    const topic = await this.topicRepository.getTopicByName(name);
+
+    return topic ? true : false;
   }
 
   remove(id: number) {
     return `This action removes a #${id} topic`;
   }
 
-  async isTopicExists(name: string) {
-    const topic = await this.topicRepository.getTopicByName(name);
-
-    return topic ? true : false;
+  update(id: number, updateTopicDto: UpdateTopicDto) {
+    return `This action updates a #${id} topic`;
   }
 }

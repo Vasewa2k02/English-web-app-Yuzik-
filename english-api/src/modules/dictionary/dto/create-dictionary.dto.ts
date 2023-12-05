@@ -6,9 +6,8 @@ type DictionaryCreateType = Pick<Dictionary, 'name' | 'description'>;
 
 export class CreateDictionaryDto implements DictionaryCreateType {
   @ApiProperty()
+  description: string | null;
+  @ApiProperty()
   @Matches(/^.{2,30}$/)
   name: string;
-
-  @ApiProperty()
-  description: string | null;
 }

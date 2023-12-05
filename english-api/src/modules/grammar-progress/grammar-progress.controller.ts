@@ -15,7 +15,7 @@ export class GrammarProgressController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(
+  private create(
     @Req() req: RequestWithUser,
     @Body() createGrammarProgressDto: CreateGrammarProgressDto,
   ): Promise<void> {

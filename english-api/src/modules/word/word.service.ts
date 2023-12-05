@@ -1,11 +1,9 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Dictionary, Word } from '@prisma/client';
+import { Dictionary } from '@prisma/client';
 import { DictionaryService } from '../dictionary/dictionary.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
@@ -13,6 +11,7 @@ import { WordForDictionaryResponse } from './response/word-for-dictionary.respon
 import { WordForSocketResponse } from './response/word-for-socket.response';
 import { WordResponse } from './response/word.response';
 import { WordRepository } from './word.repository';
+import { CreateWordArrayDto } from './dto/create-word-array.dto';
 
 @Injectable()
 export class WordService {
@@ -45,6 +44,62 @@ export class WordService {
     return await this.wordRepository.createWord(dictionaryId, createWordDto);
   }
 
+  public async createWordArray(
+    userId: number,
+    dictionaryId: number,
+    createWordArrayDto: CreateWordArrayDto,
+  ): Promise<CreateWordDto[]> {
+    await this.dictionaryService.checkDictionaryOwner(dictionaryId, userId);
+
+    const createdWords = [];
+
+    for (const wordDto of createWordArrayDto.wordArray) {
+      const word = await this.wordRepository.getWord(
+        wordDto.englishSpelling,
+        wordDto.russianSpelling,
+      );
+
+      if (
+        !(
+          word &&
+          word.dictionaries.find((item: Dictionary) => item.id === dictionaryId)
+        )
+      ) {
+        createdWords.push(wordDto);
+        await this.wordRepository.createWord(dictionaryId, wordDto);
+      }
+    }
+
+    return createdWords;
+  }
+
+  public async getRandomWord(): Promise<WordForSocketResponse> {
+    return await this.wordRepository.getRandomWord();
+  }
+
+  public async removeWordFromDictionary(
+    userId: number,
+    wordId: number,
+    dictionaryId: number,
+  ): Promise<void> {
+    const word: WordResponse = await this.wordRepository.getWordById(wordId);
+
+    if (!word) {
+      throw new NotFoundException('Word not found');
+    }
+
+    if (
+      !word.dictionaries.some(
+        (dictionary) =>
+          dictionary.creatorId === userId && dictionary.id === dictionaryId,
+      )
+    ) {
+      throw new NotFoundException('This word doesn`t exist in this dictionary');
+    }
+
+    await this.wordRepository.removeWordFromDictionary(wordId, dictionaryId);
+  }
+
   public async updateWord(
     userRoleId: number,
     wordId: number,
@@ -75,32 +130,5 @@ export class WordService {
     }
 
     return await this.wordRepository.updateWord(wordId, updateWordDto);
-  }
-
-  public async removeWordFromDictionary(
-    userId: number,
-    wordId: number,
-    dictionaryId: number,
-  ): Promise<void> {
-    const word: WordResponse = await this.wordRepository.getWordById(wordId);
-
-    if (!word) {
-      throw new NotFoundException('Word not found');
-    }
-
-    if (
-      !word.dictionaries.some(
-        (dictionary) =>
-          dictionary.creatorId === userId && dictionary.id === dictionaryId,
-      )
-    ) {
-      throw new NotFoundException('This word doesn`t exist in this dictionary');
-    }
-
-    await this.wordRepository.removeWordFromDictionary(wordId, dictionaryId);
-  }
-
-  public async getRandomWord(): Promise<WordForSocketResponse> {
-    return await this.wordRepository.getRandomWord();
   }
 }

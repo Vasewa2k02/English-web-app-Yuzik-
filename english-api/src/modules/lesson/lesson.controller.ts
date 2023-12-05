@@ -26,7 +26,7 @@ export class LessonController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  createLesson(
+  private createLesson(
     @Body() createLessonDto: CreateLessonDto,
   ): Promise<LessonResponse> {
     return this.lessonService.createLesson(createLessonDto);
@@ -40,7 +40,16 @@ export class LessonController {
     return this.lessonService.getLessons();
   }
 
-  // @ApiBearerAuth()
+  
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  public remove(@Param('id') id: string): Promise<void> {
+    return this.lessonService.removeLesson(+id);
+  }
+
+// @ApiBearerAuth()
   // @ApiOkResponse(swaggerType(LessonResponse))
   // @UseGuards(JwtAuthGuard)
   // @Get('learn')
@@ -59,12 +68,5 @@ export class LessonController {
     @Body() updateLessonDto: UpdateLessonDto,
   ): Promise<LessonResponse> {
     return this.lessonService.updateLesson(+id, updateLessonDto);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  public remove(@Param('id') id: string): Promise<void> {
-    return this.lessonService.removeLesson(+id);
   }
 }

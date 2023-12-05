@@ -8,24 +8,6 @@ import { WordForExportResponse } from '../word/response/word-for-export.response
 
 @Injectable()
 export class DictionaryRepository {
-  constructor(private readonly db: DatabaseService) {}
-
-  private fullDictionarySelect = {
-    id: true,
-    name: true,
-    description: true,
-    creatorId: true,
-    words: {
-      select: {
-        id: true,
-        englishSpelling: true,
-        transcription: true,
-        russianSpelling: true,
-        description: true,
-      },
-    },
-  };
-
   private dictionariesReviewSelect = {
     id: true,
     name: true,
@@ -47,6 +29,23 @@ export class DictionaryRepository {
       },
     },
   };
+  private fullDictionarySelect = {
+    id: true,
+    name: true,
+    description: true,
+    creatorId: true,
+    words: {
+      select: {
+        id: true,
+        englishSpelling: true,
+        transcription: true,
+        russianSpelling: true,
+        description: true,
+      },
+    },
+  };
+
+  constructor(private readonly db: DatabaseService) {}
 
   public async createDictionary(
     creatorId: number,
@@ -61,6 +60,28 @@ export class DictionaryRepository {
     });
   }
 
+  public async exportDictionaryById(
+    id: number,
+  ): Promise<WordForExportResponse[]> {
+    const dictionary = await this.db.dictionary.findMany({
+      where: {
+        id,
+      },
+      select: {
+        words: {
+          select: {
+            englishSpelling: true,
+            transcription: true,
+            russianSpelling: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    return dictionary[0].words;
+  }
+
   public async getAdminDictionaries(): Promise<DictionaryResponse[]> {
     return await this.db.dictionary.findMany({
       where: {
@@ -69,50 +90,6 @@ export class DictionaryRepository {
         },
       },
       select: this.fullDictionarySelect,
-    });
-  }
-
-  public async getUserDictionaries(
-    creatorId: number,
-  ): Promise<DictionaryResponse[]> {
-    return await this.db.dictionary.findMany({
-      where: {
-        creatorId,
-      },
-      select: this.fullDictionarySelect,
-    });
-  }
-
-  public async getDictionariesReview(creatorId: number): Promise<any[]> {
-    return await this.db.dictionary.findMany({
-      where: {
-        OR: [{ creatorId }, { user: { roleId: 2 } }],
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        creatorId: true,
-        words: {
-          select: {
-            id: true,
-            englishSpelling: true,
-            transcription: true,
-            russianSpelling: true,
-            description: true,
-            lexiconProgress: {
-              where: {
-                userId: creatorId,
-              },
-              select: {
-                progressCount: true,
-                isLearned: true,
-              },
-              take: 1,
-            },
-          },
-        },
-      },
     });
   }
 
@@ -150,12 +127,64 @@ export class DictionaryRepository {
     });
   }
 
+  public async getDictionariesReview(creatorId: number): Promise<any[]> {
+    return await this.db.dictionary.findMany({
+      where: {
+        OR: [{ creatorId }, { user: { roleId: 2 } }],
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        creatorId: true,
+        words: {
+          select: {
+            id: true,
+            englishSpelling: true,
+            transcription: true,
+            russianSpelling: true,
+            description: true,
+            lexiconProgress: {
+              where: {
+                userId: creatorId,
+              },
+              select: {
+                progressCount: true,
+                isLearned: true,
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+  }
+
   public async getDictionaryById(id: number): Promise<DictionaryResponse> {
     return await this.db.dictionary.findUnique({
       where: {
         id,
       },
       select: this.fullDictionarySelect,
+    });
+  }
+
+  public async getUserDictionaries(
+    creatorId: number,
+  ): Promise<DictionaryResponse[]> {
+    return await this.db.dictionary.findMany({
+      where: {
+        creatorId,
+      },
+      select: this.fullDictionarySelect,
+    });
+  }
+
+  public async removeDictionaryById(id: number): Promise<void> {
+    await this.db.dictionary.delete({
+      where: {
+        id,
+      },
     });
   }
 
@@ -172,35 +201,5 @@ export class DictionaryRepository {
       },
       select: this.fullDictionarySelect,
     });
-  }
-
-  public async removeDictionaryById(id: number): Promise<void> {
-    await this.db.dictionary.delete({
-      where: {
-        id,
-      },
-    });
-  }
-
-  public async exportDictionaryById(
-    id: number,
-  ): Promise<WordForExportResponse[]> {
-    const dictionary = await this.db.dictionary.findMany({
-      where: {
-        id,
-      },
-      select: {
-        words: {
-          select: {
-            englishSpelling: true,
-            transcription: true,
-            russianSpelling: true,
-            description: true,
-          },
-        },
-      },
-    });
-
-    return dictionary[0].words;
   }
 }

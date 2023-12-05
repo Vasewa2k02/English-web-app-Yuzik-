@@ -27,13 +27,12 @@ import { UserLoginResponse } from './response/user-login.reponse';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOkResponse()
-  @HttpCode(HttpStatus.CREATED)
-  @Post('registration')
-  public registration(
-    @Body() registrationDto: UserRegistrationDto,
-  ): Promise<void> {
-    return this.authService.registration(registrationDto);
+  @ApiOkResponse(swaggerType(UserResponse))
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  public getCurrentUser(@Req() req: RequestWithUser) {
+    return this.authService.getCurrentUser(req);
   }
 
   @ApiOkResponse(swaggerType(UserLoginResponse))
@@ -44,12 +43,12 @@ export class AuthController {
     return this.authService.login(req);
   }
 
-  @ApiOkResponse(swaggerType(UserResponse))
-  @ApiBearerAuth()
+  @ApiOkResponse()
   @UseGuards(JwtAuthGuard)
-  @Get()
-  public getCurrentUser(@Req() req: RequestWithUser) {
-    return this.authService.getCurrentUser(req);
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  public logout(@Req() req: RequestWithUser): Promise<void> {
+    return this.authService.removeRefreshToken(req);
   }
 
   @ApiOkResponse(swaggerType(AccessTokenResponse))
@@ -61,10 +60,11 @@ export class AuthController {
   }
 
   @ApiOkResponse()
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @Post('logout')
-  public logout(@Req() req: RequestWithUser): Promise<void> {
-    return this.authService.removeRefreshToken(req);
+  @HttpCode(HttpStatus.CREATED)
+  @Post('registration')
+  public registration(
+    @Body() registrationDto: UserRegistrationDto,
+  ): Promise<void> {
+    return this.authService.registration(registrationDto);
   }
 }

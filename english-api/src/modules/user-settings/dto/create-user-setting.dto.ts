@@ -15,19 +15,15 @@ type UserSettingsType = Pick<
 export class CreateUserSettingsDto implements UserSettingsType {
   @ApiProperty()
   @IsNumber()
-  userId: number;
-
-  @ApiProperty()
-  @IsNumber()
   countRepeatWordForLearned: number;
-
   @ApiProperty()
   @IsNumber()
   countRepeatWordsSimultaneously: number;
-
-  @ApiProperty()
-  learningModeWords: LearningMode;
-
   @ApiProperty()
   learningModeTasks: LearningMode;
+  @ApiProperty()
+  learningModeWords: LearningMode;
+  @ApiProperty()
+  @IsNumber()
+  userId: number;
 }

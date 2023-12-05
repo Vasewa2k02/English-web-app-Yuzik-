@@ -7,15 +7,6 @@ import { UserResponse } from './response/user.response';
 
 @Injectable()
 export class UserRepository {
-  constructor(private readonly db: DatabaseService) {}
-
-  private userSelect = {
-    id: true,
-    email: true,
-    roleId: true,
-    idEnableLesson: true,
-  };
-
   private fullUserSelect = {
     id: true,
     name: true,
@@ -45,6 +36,14 @@ export class UserRepository {
       },
     },
   };
+  private userSelect = {
+    id: true,
+    email: true,
+    roleId: true,
+    idEnableLesson: true,
+  };
+
+  constructor(private readonly db: DatabaseService) {}
 
   public async createUser(
     createUserDto: CreateUserDto,
@@ -73,13 +72,17 @@ export class UserRepository {
     });
   }
 
-  public async getUserById(id: number): Promise<UserResponse> {
-    return await this.db.user.findUnique({
-      where: {
-        id,
-      },
-      select: this.fullUserSelect,
-    });
+  public async getHashedUserPassword(id: number): Promise<string> {
+    return (
+      await this.db.user.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          password: true,
+        },
+      })
+    ).password;
   }
 
   public async getUserByEmail(email: string): Promise<UserResponse> {
@@ -99,7 +102,7 @@ export class UserRepository {
     });
   }
 
-  public async getUserByIdWithPermissions(id: number): Promise<UserResponse> {
+  public async getUserById(id: number): Promise<UserResponse> {
     return await this.db.user.findUnique({
       where: {
         id,
@@ -108,26 +111,11 @@ export class UserRepository {
     });
   }
 
-  public async getHashedUserPassword(id: number): Promise<string> {
-    return (
-      await this.db.user.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          password: true,
-        },
-      })
-    ).password;
-  }
-
-  public async updateUserPassword(
-    id: number,
-    password: string,
-  ): Promise<UserResponse> {
-    return await this.db.user.update({
-      where: { id },
-      data: { password },
+  public async getUserByIdWithPermissions(id: number): Promise<UserResponse> {
+    return await this.db.user.findUnique({
+      where: {
+        id,
+      },
       select: this.fullUserSelect,
     });
   }
@@ -139,6 +127,17 @@ export class UserRepository {
     await this.db.user.update({
       where: { id: userId },
       data: { idEnableLesson },
+    });
+  }
+
+  public async updateUserPassword(
+    id: number,
+    password: string,
+  ): Promise<UserResponse> {
+    return await this.db.user.update({
+      where: { id },
+      data: { password },
+      select: this.fullUserSelect,
     });
   }
 }

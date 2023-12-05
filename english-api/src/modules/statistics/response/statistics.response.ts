@@ -10,14 +10,12 @@ class UserForStatistics {
 
 export class StatisticsResponse {
   @ApiProperty()
+  quizPoints: number;
+  @ApiProperty()
+  tasks: number;
+  @ApiProperty()
   user: UserForStatistics;
 
   @ApiProperty()
   words: number;
-
-  @ApiProperty()
-  tasks: number;
-
-  @ApiProperty()
-  quizPoints: number;
 }

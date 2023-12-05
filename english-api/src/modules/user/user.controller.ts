@@ -24,19 +24,19 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse(swaggerType(UserResponse))
-  @Get(':id')
-  public findOne(@Param('id') id: string): Promise<UserResponse> {
-    return this.userService.getUserById(+id);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @ApiOkResponse(swaggerType(UserResponse))
   @Patch()
   public changePassword(
     @Req() req: RequestWithUser,
     @Body() updateUserPasswordDto: UpdateUserPasswordDto,
   ): Promise<void> {
     return this.userService.changeUserPassword(req.user, updateUserPasswordDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse(swaggerType(UserResponse))
+  @Get(':id')
+  public findOne(@Param('id') id: string): Promise<UserResponse> {
+    return this.userService.getUserById(+id);
   }
 }

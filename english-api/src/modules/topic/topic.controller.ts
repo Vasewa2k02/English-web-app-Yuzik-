@@ -25,7 +25,7 @@ export class TopicController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createTopicDto: CreateTopicDto) {
+  private create(@Body() createTopicDto: CreateTopicDto) {
     return this.topicService.create(createTopicDto);
   }
 
@@ -33,22 +33,22 @@ export class TopicController {
   @ApiOkResponse(swaggerType(TopicResponse))
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
+  private findAll() {
     return this.topicService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  private findOne(@Param('id') id: string) {
     return this.topicService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTopicDto: UpdateTopicDto) {
-    return this.topicService.update(+id, updateTopicDto);
+  @Delete(':id')
+  private remove(@Param('id') id: string) {
+    return this.topicService.remove(+id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.topicService.remove(+id);
+  @Patch(':id')
+  private update(@Param('id') id: string, @Body() updateTopicDto: UpdateTopicDto) {
+    return this.topicService.update(+id, updateTopicDto);
   }
 }

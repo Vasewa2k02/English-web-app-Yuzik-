@@ -15,6 +15,14 @@ export class LessonService {
     private readonly userService: UserService,
   ) {}
 
+  private async checkLessonExistence(id: number): Promise<void> {
+    const lesson = await this.lessonRepository.getLessonById(id);
+
+    if (!lesson) {
+      throw new NotFoundException('This lesson doesn`t exist');
+    }
+  }
+
   async createLesson(
     createLessonDto: CreateLessonDto,
   ): Promise<LessonResponse> {
@@ -25,7 +33,14 @@ export class LessonService {
     return await this.lessonRepository.getLessons();
   }
 
-  // async getLearnLessons(req: RequestWithUser): Promise<LessonResponse[]> {
+  
+
+  async removeLesson(id: number): Promise<void> {
+    await this.checkLessonExistence(id);
+    await this.lessonRepository.removeLesson(id);
+  }
+
+// async getLearnLessons(req: RequestWithUser): Promise<LessonResponse[]> {
   //   const userId = req.user.id;
 
   //   const enableLesson = await this.lessonRepository.getLessonById(
@@ -69,18 +84,5 @@ export class LessonService {
   ): Promise<LessonResponse> {
     await this.checkLessonExistence(id);
     return await this.lessonRepository.updateLesson(id, updateLessonDto);
-  }
-
-  async removeLesson(id: number): Promise<void> {
-    await this.checkLessonExistence(id);
-    await this.lessonRepository.removeLesson(id);
-  }
-
-  private async checkLessonExistence(id: number): Promise<void> {
-    const lesson = await this.lessonRepository.getLessonById(id);
-
-    if (!lesson) {
-      throw new NotFoundException('This lesson doesn`t exist');
-    }
   }
 }

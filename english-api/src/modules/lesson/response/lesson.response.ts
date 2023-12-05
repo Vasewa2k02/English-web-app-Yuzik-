@@ -7,6 +7,10 @@ import { TaskResponse } from 'src/modules/task/response/task.response';
 type LessonResponseType = Omit<Lesson, 'topicId'>;
 
 export class LessonResponse implements LessonResponseType {
+  @ApiProperty(swaggerType(TaskResponse))
+  tasks: TaskResponse[];
+  @ApiProperty()
+  topic: Topic;
   @ApiProperty()
   id: number;
 
@@ -15,10 +19,4 @@ export class LessonResponse implements LessonResponseType {
 
   @ApiProperty()
   theory: string;
-
-  @ApiProperty()
-  topic: Topic;
-
-  @ApiProperty(swaggerType(TaskResponse))
-  tasks: TaskResponse[];
 }

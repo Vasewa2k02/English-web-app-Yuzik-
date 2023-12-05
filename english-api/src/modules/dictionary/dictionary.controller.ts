@@ -41,24 +41,6 @@ export class DictionaryController {
   }
 
   @ApiBearerAuth()
-  @ApiOkResponse(swaggerType(DictionaryResponse))
-  @UseGuards(JwtAuthGuard)
-  @Get('admin')
-  public getAdminDictionaries(): Promise<DictionaryResponse[]> {
-    return this.dictionaryService.getAdminDictionaries();
-  }
-
-  @ApiBearerAuth()
-  @ApiOkResponse(swaggerType(DictionaryResponse))
-  @UseGuards(JwtAuthGuard)
-  @Get('user')
-  public getUserDictionaries(
-    @Req() req: RequestWithUser,
-  ): Promise<DictionaryResponse[]> {
-    return this.dictionaryService.getUserDictionaries(+req.user.id);
-  }
-
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('export/:id')
   public async export(@Param('id') id: string, @Res() res: ExpressResponse) {
@@ -81,11 +63,9 @@ export class DictionaryController {
   @ApiBearerAuth()
   @ApiOkResponse(swaggerType(DictionaryResponse))
   @UseGuards(JwtAuthGuard)
-  @Get('review')
-  public getDictionariesReview(
-    @Req() req: RequestWithUser,
-  ): Promise<DictionaryReviewResponse[]> {
-    return this.dictionaryService.getDictionariesReview(+req.user.id);
+  @Get('admin')
+  public getAdminDictionaries(): Promise<DictionaryResponse[]> {
+    return this.dictionaryService.getAdminDictionaries();
   }
 
   @ApiBearerAuth()
@@ -96,6 +76,36 @@ export class DictionaryController {
     @Req() req: RequestWithUser,
   ): Promise<DictionaryReviewResponse[]> {
     return this.dictionaryService.getDictionariesLearn(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
+  @Get('review')
+  public getDictionariesReview(
+    @Req() req: RequestWithUser,
+  ): Promise<DictionaryReviewResponse[]> {
+    return this.dictionaryService.getDictionariesReview(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @ApiOkResponse(swaggerType(DictionaryResponse))
+  @UseGuards(JwtAuthGuard)
+  @Get('user')
+  public getUserDictionaries(
+    @Req() req: RequestWithUser,
+  ): Promise<DictionaryResponse[]> {
+    return this.dictionaryService.getUserDictionaries(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  public remove(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ): Promise<void> {
+    return this.dictionaryService.removeDictionary(+id, +req.user.id);
   }
 
   @ApiBearerAuth()
@@ -112,15 +122,5 @@ export class DictionaryController {
       +req.user.id,
       updateDictionaryDto,
     );
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  public remove(
-    @Param('id') id: string,
-    @Req() req: RequestWithUser,
-  ): Promise<void> {
-    return this.dictionaryService.removeDictionary(+id, +req.user.id);
   }
 }

@@ -25,8 +25,15 @@ export class TaskController {
   @ApiOkResponse(swaggerType(TaskResponse))
   @UseGuards(JwtAuthGuard)
   @Post()
-  createLesson(@Body() сreateTaskDto: CreateTaskDto): Promise<TaskResponse> {
+  private createLesson(@Body() сreateTaskDto: CreateTaskDto): Promise<TaskResponse> {
     return this.taskService.createTask(сreateTaskDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  public remove(@Param('id') id: string): Promise<void> {
+    return this.taskService.removeTask(+id);
   }
 
   @ApiBearerAuth()
@@ -38,12 +45,5 @@ export class TaskController {
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<TaskResponse> {
     return this.taskService.updateTask(+id, updateTaskDto);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  public remove(@Param('id') id: string): Promise<void> {
-    return this.taskService.removeTask(+id);
   }
 }

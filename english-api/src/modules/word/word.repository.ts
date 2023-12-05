@@ -9,8 +9,6 @@ import { WordResponse } from './response/word.response';
 
 @Injectable()
 export class WordRepository {
-  constructor(private readonly db: DatabaseService) {}
-
   private fullWordSelect = {
     id: true,
     englishSpelling: true,
@@ -26,13 +24,14 @@ export class WordRepository {
       },
     },
   };
-
   private wordForSocketSelect = {
     id: true,
     englishSpelling: true,
     russianSpelling: true,
     description: true,
   };
+
+  constructor(private readonly db: DatabaseService) {}
 
   public async createWord(
     dictionaryId: number,
@@ -64,13 +63,12 @@ export class WordRepository {
     });
   }
 
-  public async getWordById(id: number): Promise<WordResponse> {
-    return await this.db.word.findUnique({
-      where: {
-        id,
-      },
-      select: this.fullWordSelect,
+  public async getRandomWord(): Promise<WordForSocketResponse> {
+    const words = await this.db.word.findMany({
+      select: this.wordForSocketSelect,
     });
+
+    return words.sort(() => Math.random() - 0.5)[0];
   }
 
   public async getWord(
@@ -88,44 +86,12 @@ export class WordRepository {
     });
   }
 
-  public async getRandomWord(): Promise<WordForSocketResponse> {
-    const words = await this.db.word.findMany({
-      select: this.wordForSocketSelect,
-    });
-
-    return words.sort(() => Math.random() - 0.5)[0];
-  }
-
-  public async updateWord(
-    id: number,
-    updateWordDto: UpdateWordDto,
-  ): Promise<WordResponse> {
-    return await this.db.word.update({
+  public async getWordById(id: number): Promise<WordResponse> {
+    return await this.db.word.findUnique({
       where: {
         id,
       },
-      data: {
-        ...updateWordDto,
-      },
       select: this.fullWordSelect,
-    });
-  }
-
-  public async removeWordFromDictionary(
-    wordId: number,
-    dictionaryId: number,
-  ): Promise<void> {
-    await this.db.word.update({
-      where: {
-        id: wordId,
-      },
-      data: {
-        dictionaries: {
-          disconnect: {
-            id: dictionaryId,
-          },
-        },
-      },
     });
   }
 
@@ -146,5 +112,38 @@ export class WordRepository {
         },
       }),
     );
+  }
+
+  public async removeWordFromDictionary(
+    wordId: number,
+    dictionaryId: number,
+  ): Promise<void> {
+    await this.db.word.update({
+      where: {
+        id: wordId,
+      },
+      data: {
+        dictionaries: {
+          disconnect: {
+            id: dictionaryId,
+          },
+        },
+      },
+    });
+  }
+
+  public async updateWord(
+    id: number,
+    updateWordDto: UpdateWordDto,
+  ): Promise<WordResponse> {
+    return await this.db.word.update({
+      where: {
+        id,
+      },
+      data: {
+        ...updateWordDto,
+      },
+      select: this.fullWordSelect,
+    });
   }
 }
