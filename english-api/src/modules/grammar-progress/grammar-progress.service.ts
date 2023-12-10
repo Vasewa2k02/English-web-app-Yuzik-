@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { GrammarProgressRepository } from './grammar-progress.repository';
+import { GrammarProgressResponse } from './response/grammar-progress.response';
 
 @Injectable()
 export class GrammarProgressService {
@@ -26,5 +27,11 @@ export class GrammarProgressService {
       userId,
       lessonId,
     );
+  }
+
+  public async getAllByUserId(
+    userId: number,
+  ): Promise<GrammarProgressResponse[]> {
+    return await this.grammarProgressRepository.getAllByUserId(userId);
   }
 }

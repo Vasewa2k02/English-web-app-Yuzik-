@@ -11,18 +11,12 @@ import * as https from 'https';
 import { AppModule } from '../src/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true,
-    httpsOptions: {
-      key: fs.readFileSync('C:\\My\\OpenSSL\\CW.key'),
-      cert: fs.readFileSync('C:\\My\\OpenSSL\\CW.crt'),
-    },
-  });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
   app.setGlobalPrefix('api');
   app.use(cookieParser());
-  app.use(cors({ credentials: true, origin: 'https://localhost:3000' }));
+  // app.use(cors({ credentials: true, origin: 'https://localhost:3000' }));
 
   const configService: ConfigService = app.get(ConfigService);
   const PORT: number = configService.get('APP_PORT');

@@ -230,9 +230,7 @@ const LexiconProgress = observer(() => {
     }
 
     setCurrentWords(_currentWords);
-    setCurrentWord(
-      _currentWords.sort(() => Math.random() - 0.5).slice(0, 1)[0]
-    );
+    setCurrentWord(_currentWords[(Math.random() * _currentWords.length) | 0]);
   };
 
   useEffect(() => {

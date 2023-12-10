@@ -8,3 +8,8 @@ export const createGrammarProgress = async (grammarProgressDto) => {
   );
   return data;
 };
+
+export const getAllByUserId = async () => {
+  const { data } = await $authHost.get(ROUTES.GRAMMAR_PROGRESS_ROUTE);
+  return data;
+};

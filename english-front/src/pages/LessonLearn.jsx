@@ -71,6 +71,7 @@ const LessonLearn = observer(() => {
   const [currentTaskFinishedAnswer, setCurrentTaskFinishedAnswer] = useState(
     []
   );
+  const [complitedTasks, setComplitedTasks] = useState([]);
 
   const [currentTaskCount, setCurrentTaskCount] = useState({
     finished: 0,
@@ -170,8 +171,12 @@ const LessonLearn = observer(() => {
   const loadData = async () => {
     try {
       const _topics = await topicApi.getAllTopics();
+      const _grammarProgress = await grammarProgressApi.getAllByUserId();
       const _lessons = lessonTransform(_topics);
 
+      console.log(_grammarProgress);
+
+      setComplitedTasks(_grammarProgress);
       setLessons(_lessons);
       setTasks(null);
       setSelectedLesson(null);
@@ -330,6 +335,10 @@ const LessonLearn = observer(() => {
     setRecordedText(speechToText);
   };
 
+  useEffect(() => {
+    setRecordedText("");
+  }, [currentTask]);
+
   return (
     <div className="lesson-learn-container">
       <Toast ref={toast} />
@@ -369,9 +378,21 @@ const LessonLearn = observer(() => {
                 : "Выберите урок"
             }
             subTitle={
-              currentTask
-                ? `Заданий выполнено: ${currentTaskCount.finished}/${currentTaskCount.all}. Из них верно: ${currentTaskCount.correct}`
-                : ""
+              <div>
+                {currentTask && (
+                  <div>
+                    {complitedTasks.find((item) =>
+                      item.taskIds.includes(currentTask.id)
+                    )
+                      ? "Вы уже выполняли это задание верно"
+                      : "Вы ещё не выполняли это задание верно"}
+                  </div>
+                )}
+                <br />
+                {currentTask
+                  ? `Сейчас выполнено заданий: ${currentTaskCount.finished}/${currentTaskCount.all}. Из них верно: ${currentTaskCount.correct}`
+                  : ""}
+              </div>
             }
           >
             {currentTask && <p className="m-0">{currentTask.mainSentence}</p>}

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from 'src/database/database.service';
+import { GrammarProgressResponse } from './response/grammar-progress.response';
 
 @Injectable()
 export class GrammarProgressRepository {
@@ -45,5 +46,42 @@ export class GrammarProgressRepository {
         },
       },
     });
+  }
+
+  public async getAllByUserId(
+    userId: number,
+  ): Promise<GrammarProgressResponse[]> {
+    const res = await this.db.grammarProgress.findMany({
+      where: {
+        userId,
+      },
+      select: {
+        taskId: true,
+        task: {
+          select: {
+            lessonId: true,
+          },
+        },
+      },
+    });
+
+    const grammarProgress = res.reduce((acc, curr) => {
+      const existingItem = acc.find(
+        (item) => item.lessonId === curr.task.lessonId,
+      );
+
+      if (existingItem) {
+        existingItem.taskIds.push(curr.taskId);
+      } else {
+        acc.push({
+          lessonId: curr.task.lessonId,
+          taskIds: [curr.taskId],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    return grammarProgress;
   }
 }

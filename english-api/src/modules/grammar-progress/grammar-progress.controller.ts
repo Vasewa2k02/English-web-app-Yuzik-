@@ -1,9 +1,10 @@
-import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
 import { GrammarProgressService } from './grammar-progress.service';
 import { CreateGrammarProgressDto } from './dto/create-grammar-progress.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import RequestWithUser from '../auth/interface/request-with-user.interface';
+import { GrammarProgressResponse } from './response/grammar-progress.response';
 
 @ApiTags('grammar-progress')
 @Controller('grammar-progress')
@@ -14,8 +15,17 @@ export class GrammarProgressController {
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  @Get()
+  getAllByUserId(
+    @Req() req: RequestWithUser,
+  ): Promise<GrammarProgressResponse[]> {
+    return this.grammarProgressService.getAllByUserId(+req.user.id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  private create(
+  create(
     @Req() req: RequestWithUser,
     @Body() createGrammarProgressDto: CreateGrammarProgressDto,
   ): Promise<void> {

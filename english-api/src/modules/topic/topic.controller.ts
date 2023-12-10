@@ -48,7 +48,10 @@ export class TopicController {
   }
 
   @Patch(':id')
-  private update(@Param('id') id: string, @Body() updateTopicDto: UpdateTopicDto) {
+  private update(
+    @Param('id') id: string,
+    @Body() updateTopicDto: UpdateTopicDto,
+  ) {
     return this.topicService.update(+id, updateTopicDto);
   }
 }
